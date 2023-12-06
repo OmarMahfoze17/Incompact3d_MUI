@@ -1,0 +1,589 @@
+  xxxx            0           4           3
+ Xcompact3d is run with the default file -->input.i3d
+ ===========================================================
+ ======================Xcompact3D===========================
+ ===Copyright (c) 2018 Eric Lamballais and Sylvain Laizet===
+ ===Modified by Felipe Schuch and Ricardo Frantz============
+ ===Modified by Paul Bartholomew, Georgios Deskos and=======
+ ===Sylvain Laizet -- 2018- ================================
+ ===========================================================
+ Git version        : v4.0-249-g8d7b078
+  xxxx            1           4           3
+  xxxx            2           4           3
+  xxxx            3           4           3
+MUI [lib_mpi_multidomain]: Rank: 4, "dummySendReceiveð†Ðk{U" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 4, "dummySendReceiveð†Ðk{U" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 1, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 1, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 2, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 2, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 3, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 3, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 0, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 0, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI Info [lib_mpi_multidomain]: 2 distinct interface(s) found
+MUI [lib_mpi_multidomain]: Setting up interface interface_1 [a1c24ebc] (rank ids are local to each interface)
+MUI [comm_mpi.h]: Rank: 2, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 0, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 3, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 4, Identifier: mpi://dummySendReceiveð†Ðk{U/interface_1, Domain size: 1, Peers: 4
+MUI [comm_mpi.h]: Rank: 1, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [lib_mpi_multidomain]: Setting up interface interface_2 [6abfb875] (rank ids are local to each interface)
+MUI [comm_mpi.h]: Rank: 1, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 3, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 4, Identifier: mpi://dummySendReceiveð†Ðk{U/interface_2, Domain size: 1, Peers: 4
+MUI [comm_mpi.h]: Rank: 2, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 0, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+ Warning : support for implicit Y diffusion and isecondder=5 is experimental
+ TBL tripping is active
+ ===========================================================
+ Turbulent boundary layer
+ ===========================================================
+ Reynolds number Re     :          1250.000
+ xnu                    :        0.00080000
+ ===========================================================
+ p_row, p_col           :         0       0
+ ===========================================================
+ Time step dt           :        0.01000000
+ Temporal scheme        :    Adams-bashforth 3
+                                           With CN for Y diffusion
+                    : DNS
+ ===========================================================
+ ifirst                 :                 1
+ ilast                  :                25
+ ===========================================================
+ Lx                     :       50.00000000
+ Ly                     :       20.00000000
+ Lz                     :        5.00000000
+ nx                     :               129
+ ny                     :               129
+ nz                     :                32
+ ===========================================================
+ istret                 :                 3
+ beta                   :        0.70000000
+ ===========================================================
+ nu0nu                  :        4.00000000
+ cnu                    :        0.33000000
+ ===========================================================
+ Scalar                 :                on
+ numscalar              :                 1
+ Schmidt number sc( 1)  :        1.00000000
+ Richardson n.  ri( 1)  :        0.00000000
+ ===========================================================
+ spinup_time            :                 0
+ wrotation              :        0.12000000
+ ===========================================================
+ Immersed boundary      :               off
+ ===========================================================
+ Boundary condition velocity field: 
+ nclx1, nclxn           :               2,2
+ ncly1, nclyn           :               2,2
+ nclz1, nclzn           :               0,0
+ ===========================================================
+ Boundary condition scalar field: 
+ nclxS1, nclxSn         :               2,2
+ nclyS1, nclySn         :               2,2
+ nclzS1, nclzSn         :               0,0
+ ===========================================================
+ Numerical precision: Double
+ ===========================================================
+ High and low speed : u1=  1.00 and u2=  1.00
+ Gravity vector     : (gx, gy, gz)=(     0.00000000,     0.00000000,     0.00000000)
+  
+ ===========================================================
+ In auto-tuning mode......
+ factors:            1           2           4
+ p_row x p_col           2           2
+ # Initializing variables...
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+  
+ ++++++++++++++++++++++++++++++++
+ LES Modelling
+ ++++++++++++++++++++++++++++++++
+ ++++++++++++++++++++++++++++++++
+  
+ Initialising IO for turb-io
+ ===========================================================
+ Visu module requires    0.00000000     GB
+ ===========================================================
+ Initialising IO for solution-io
+ ===========================================================
+ Diffusion number
+ cfl_diff_x             :           0.00005243
+ cfl_diff_y             :           0.02775153
+ cfl_diff_z             :           0.00032768
+ cfl_diff_sum           :           0.02813164
+ ===========================================================
+ U,V,W min=   0.00000000       0.00000000       0.00000000    
+ U,V,W max=  0.999946296       3.37742991E-03   0.00000000    
+ Phi1 min max=  0.250000000       1.00000000    
+ ===========================================================
+ Time step =      1/     25, Time unit =   0.0100
+ Mass balance: L-BC, R-BC,   19.648181   19.648181
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16887   -0.00844
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.479310
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16887   -0.00000
+ DIV U* max mean=   8.0491660146725277E-002   1.5282893892950007E-003
+  
+ ***** Using the generic FFT engine *****
+  
+ DIV U  max mean=   8.2392301360755882E-006   3.0757657318449337E-006
+ U,V,W min=  -8.23412649E-03  -4.38587333E-04  -7.76168017E-04
+ U,V,W max=  0.999946296       7.59151950E-03   8.94663855E-04
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00034921
+ CFL_z                  :        0.00005726
+ Phi1 min max=   0.00000000      0.356191516    
+ ===========================================================
+ Time step =      2/     25, Time unit =   0.0200
+ Mass balance: L-BC, R-BC,   19.648181   19.485460
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16887   -0.00031
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.479310
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16409    0.00024
+ DIV U* max mean=   8.8185309429474903E-002   6.1919674000220450E-005
+ DIV U  max mean=   1.1941844540656137E-004   5.8774657983178498E-005
+ U,V,W min=  -9.17480327E-04  -9.08277638E-04  -1.61840580E-03
+ U,V,W max=  0.999967873       7.59151950E-03   1.86713994E-03
+ CFL_x                  :        0.02559918
+ CFL_y                  :        0.00205849
+ CFL_z                  :        0.00011950
+ Phi1 min max=   0.00000000      0.454545856    
+ Time for this time step (s):  0.138634995    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      3/     25, Time unit =   0.0300
+ Mass balance: L-BC, R-BC,   19.648181   19.478225
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16409    0.00029
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.484087
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.15124    0.00064
+ DIV U* max mean=   8.6035135584374756E-002   6.2095593003891211E-005
+ DIV U  max mean=   7.9808766679828109E-008   1.0775051936497975E-005
+ U,V,W min=   0.00000000      -1.36579399E-03  -2.38901749E-03
+ U,V,W max=  0.999953151       4.39850055E-03   2.75147310E-03
+ CFL_x                  :        0.02559880
+ CFL_y                  :        0.00174882
+ CFL_z                  :        0.00017609
+ Phi1 min max=   0.00000000      0.545918405    
+ Time for this time step (s):  0.134461001    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      4/     25, Time unit =   0.0400
+ Mass balance: L-BC, R-BC,   19.648181   19.496213
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.15124    0.00004
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.496940
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.13988    0.00057
+ DIV U* max mean=   8.5872948283505279E-002   4.7108902872328798E-005
+ DIV U  max mean=   7.8232644849783887E-008   1.1740864021675928E-005
+ U,V,W min=  -3.86635860E-04  -1.82807958E-03  -3.11112381E-03
+ U,V,W max=  0.999946296       3.56139126E-03   3.58246407E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00143713
+ CFL_z                  :        0.00022928
+ Phi1 min max=   0.00000000      0.630638897    
+ Time for this time step (s):  0.130128995    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      5/     25, Time unit =   0.0500
+ Mass balance: L-BC, R-BC,   19.648181   19.508541
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.13988   -0.00001
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.508305
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.12976    0.00051
+ DIV U* max mean=   8.6091095952423730E-002   4.1281595184227289E-005
+ DIV U  max mean=   8.3213341837414039E-008   3.7656796142373820E-006
+ U,V,W min=  -2.49430042E-04  -2.29126425E-03  -3.81052587E-03
+ U,V,W max=  0.999951839       3.48578743E-03   4.38636355E-03
+ CFL_x                  :        0.02559877
+ CFL_y                  :        0.00161123
+ CFL_z                  :        0.00028073
+ Phi1 min max=   0.00000000      0.709681690    
+ Time for this time step (s):  0.128754005    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      6/     25, Time unit =   0.0600
+ Mass balance: L-BC, R-BC,   19.648181   19.518492
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.12976   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.518418
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.12038    0.00047
+ DIV U* max mean=   8.6273974201350190E-002   4.0707426354590300E-005
+ DIV U  max mean=   4.3816361806840156E-006   2.1054943506554063E-007
+ U,V,W min=  -1.24521597E-04  -2.75367079E-03  -4.48728213E-03
+ U,V,W max=  0.999946296       3.58330552E-03   5.16308006E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00192625
+ CFL_z                  :        0.00033044
+ Phi1 min max=   0.00000000      0.783453345    
+ Time for this time step (s):  0.131880000    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      7/     25, Time unit =   0.0700
+ Mass balance: L-BC, R-BC,   19.648181   19.527814
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.12038   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.527796
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.11157    0.00044
+ DIV U* max mean=   8.6435303205059405E-002   4.0035439082151753E-005
+ DIV U  max mean=   5.5772541407882574E-006   7.0069515012093376E-007
+ U,V,W min=  -2.46436866E-05  -3.21511296E-03  -5.14132949E-03
+ U,V,W max=  0.999946296       3.89689230E-03   5.91264805E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00224003
+ CFL_z                  :        0.00037841
+ Phi1 min max=   0.00000000      0.852431834    
+ Time for this time step (s):  0.130654007    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      8/     25, Time unit =   0.0800
+ Mass balance: L-BC, R-BC,   19.648181   19.536633
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.11157   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.536609
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.10333    0.00041
+ DIV U* max mean=   8.6579338558330193E-002   3.8693186642645617E-005
+ DIV U  max mean=   4.6376556553462165E-006   2.5879335538303857E-007
+ U,V,W min=  -2.84141515E-05  -3.67551087E-03  -5.77371288E-03
+ U,V,W max=  0.999946296       4.44075372E-03   6.63618045E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00255258
+ CFL_z                  :        0.00042472
+ Phi1 min max=   0.00000000      0.917043626    
+ Time for this time step (s):  0.130105004    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      9/     25, Time unit =   0.0900
+ Mass balance: L-BC, R-BC,   19.648181   19.544889
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.10333   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.544855
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.09565    0.00038
+ DIV U* max mean=   8.6708707932088944E-002   3.7496749875588810E-005
+ DIV U  max mean=   3.8293429857076252E-006   3.0916632534804331E-007
+ U,V,W min=  -2.87304392E-05  -4.13485011E-03  -6.39097020E-03
+ U,V,W max=  0.999946296       4.98248404E-03   7.33479904E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00286383
+ CFL_z                  :        0.00046943
+ Phi1 min max=   0.00000000      0.977670312    
+ Time for this time step (s):  0.129261002    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     10/     25, Time unit =   0.1000
+ Mass balance: L-BC, R-BC,   19.648181   19.552570
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.09565   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.552530
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08854    0.00036
+ DIV U* max mean=   8.6824562741570729E-002   3.6542884202705238E-005
+ DIV U  max mean=   3.5688326063778152E-006   4.2572386202785903E-007
+ U,V,W min=  -2.79563865E-05  -4.59315721E-03  -6.99418504E-03
+ U,V,W max=  0.999946296       5.52194379E-03   8.00947007E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00317374
+ CFL_z                  :        0.00051261
+ Phi1 min max=   0.00000000       1.03465426    
+ Time for this time step (s):  0.134068996    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     11/     25, Time unit =   0.1100
+ Mass balance: L-BC, R-BC,   19.648181   19.559685
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08854   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.559644
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08196    0.00033
+ DIV U* max mean=   8.6927898540994752E-002   3.5853651190132196E-005
+ DIV U  max mean=   3.6384604990816378E-006   3.9888245163873498E-007
+ U,V,W min=  -2.66097231E-05  -5.05049201E-03  -7.58146588E-03
+ U,V,W max=  0.999946296       6.05896581E-03   8.66104756E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00348220
+ CFL_z                  :        0.00055431
+ Phi1 min max=   0.00000000       1.08830297    
+ Time for this time step (s):  0.134645998    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     12/     25, Time unit =   0.1200
+ Mass balance: L-BC, R-BC,   19.648181   19.566259
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08196   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.566219
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.07589    0.00030
+ DIV U* max mean=   8.7019409450816987E-002   3.5228783698468428E-005
+ DIV U  max mean=   3.7978117898920059E-006   3.3429740094470401E-007
+ U,V,W min=  -2.47997086E-05  -5.50693274E-03  -8.15375336E-03
+ U,V,W max=  0.999946296       6.59336289E-03   9.29029658E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00378912
+ CFL_z                  :        0.00059458
+ Phi1 min max=   0.00000000       1.13889313    
+ Time for this time step (s):  0.129942000    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     13/     25, Time unit =   0.1300
+ Mass balance: L-BC, R-BC,   19.648181   19.572327
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.07589   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.572289
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.07029    0.00028
+ DIV U* max mean=   8.7099517603160023E-002   3.4571521661157669E-005
+ DIV U  max mean=   3.9313686671886555E-006   2.8210856405297398E-007
+ U,V,W min=  -2.27821183E-05  -5.96256368E-03  -8.71190988E-03
+ U,V,W max=  0.999946296       7.12494645E-03   9.89790633E-03
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00409440
+ CFL_z                  :        0.00063347
+ Phi1 min max=   0.00000000       1.18667400    
+ Time for this time step (s):  0.130484000    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     14/     25, Time unit =   0.1400
+ Mass balance: L-BC, R-BC,   19.648181   19.577928
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.07029   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.577893
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.06511    0.00026
+ DIV U* max mean=   8.7168549820376307E-002   3.3948000810015901E-005
+ DIV U  max mean=   4.0174327784922040E-006   2.5135661881191989E-007
+ U,V,W min=  -2.08062847E-05  -6.41745888E-03  -9.25672427E-03
+ U,V,W max=  0.999946296       7.65353721E-03   1.04844971E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00439792
+ CFL_z                  :        0.00067101
+ Phi1 min max=   0.00000000       1.23187053    
+ Time for this time step (s):  0.129399002    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     15/     25, Time unit =   0.1500
+ Mass balance: L-BC, R-BC,   19.648181   19.583105
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.06511   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.583073
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.06032    0.00024
+ DIV U* max mean=   8.7226822605812035E-002   3.3382958546792748E-005
+ DIV U  max mean=   4.0720561131364061E-006   2.3454336877097473E-007
+ U,V,W min=  -1.90210649E-05  -6.87167700E-03  -9.78892297E-03
+ U,V,W max=  0.999946296       8.17897450E-03   1.10890688E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00469961
+ CFL_z                  :        0.00070970
+ Phi1 min max=   0.00000000       1.27468598    
+ Time for this time step (s):  0.133028999    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     16/     25, Time unit =   0.1600
+ Mass balance: L-BC, R-BC,   19.648181   19.587893
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.06032   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.587863
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.05588    0.00022
+ DIV U* max mean=   8.7274661286238286E-002   3.2910601814336289E-005
+ DIV U  max mean=   4.1149774285380517E-006   2.2297261401523182E-007
+ U,V,W min=  -1.74726738E-05  -7.32525811E-03  -1.03152590E-02
+ U,V,W max=  0.999946296       8.70111771E-03   1.17807565E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00499937
+ CFL_z                  :        0.00075397
+ Phi1 min max=   0.00000000       1.31530452    
+ Time for this time step (s):  0.130657002    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     17/     25, Time unit =   0.1700
+ Mass balance: L-BC, R-BC,   19.648181   19.592325
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.05588   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.592298
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.05178    0.00021
+ DIV U* max mean=   8.7312396178863341E-002   3.2487770783848473E-005
+ DIV U  max mean=   4.1579418307197552E-006   2.1147812445632289E-007
+ U,V,W min=  -1.61381613E-05  -7.77822733E-03  -1.09472927E-02
+ U,V,W max=  0.999946296       9.21984296E-03   1.24613792E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00529714
+ CFL_z                  :        0.00079753
+ Phi1 min max=   0.00000000       1.35389256    
+ Time for this time step (s):  0.132797003    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     18/     25, Time unit =   0.1800
+ Mass balance: L-BC, R-BC,   19.648181   19.596430
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.05178   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.596404
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.04798    0.00019
+ DIV U* max mean=   8.7340352794747833E-002   3.2065693247582981E-005
+ DIV U  max mean=   4.2048020806272938E-006   1.9832515549096616E-007
+ U,V,W min=  -1.49651869E-05  -8.23059585E-03  -1.15752127E-02
+ U,V,W max=  0.999946296       9.73504130E-03   1.31303919E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00559285
+ CFL_z                  :        0.00084035
+ Phi1 min max=   0.00000000       1.39060152    
+ Time for this time step (s):  0.131467998    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     19/     25, Time unit =   0.1900
+ Mass balance: L-BC, R-BC,   19.648181   19.600230
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.04798   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.600206
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.04446    0.00018
+ DIV U* max mean=   8.7358842995083813E-002   3.1650340389284783E-005
+ DIV U  max mean=   4.2550644962234618E-006   1.8367958586188151E-007
+ U,V,W min=  -1.39023296E-05  -8.68236925E-03  -1.21988561E-02
+ U,V,W max=  0.999946296       1.02466121E-02   1.37872975E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00588643
+ CFL_z                  :        0.00088239
+ Phi1 min max=   0.00000000       1.42556894    
+ Time for this time step (s):  0.129574001    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     20/     25, Time unit =   0.2000
+ Mass balance: L-BC, R-BC,   19.648181   19.603750
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.04446   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.603726
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.04120    0.00016
+ DIV U* max mean=   8.7368159862697609E-002   3.1267520838067476E-005
+ DIV U  max mean=   4.3069387619120839E-006   1.6828295111827262E-007
+ U,V,W min=  -1.29141781E-05  -9.13354848E-03  -1.28180869E-02
+ U,V,W max=  0.999946296       1.07544586E-02   1.44316358E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00617784
+ CFL_z                  :        0.00092362
+ Phi1 min max=   0.00000000       1.45891988    
+ Time for this time step (s):  0.132424995    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     21/     25, Time unit =   0.2100
+ Mass balance: L-BC, R-BC,   19.648181   19.607007
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.04120   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.606985
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03818    0.00015
+ DIV U* max mean=   8.7368576199094800E-002   3.0929582188587542E-005
+ DIV U  max mean=   4.3589196766390954E-006   1.5277855566440404E-007
+ U,V,W min=  -1.19833521E-05  -9.58413165E-03  -1.34327943E-02
+ U,V,W max=  0.999946296       1.12584857E-02   1.50629869E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00646702
+ CFL_z                  :        0.00096403
+ Phi1 min max=   0.00000000       1.49076819    
+ Time for this time step (s):  0.130364999    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     22/     25, Time unit =   0.2200
+ Mass balance: L-BC, R-BC,   19.648181   19.610023
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03818   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.610001
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03539    0.00014
+ DIV U* max mean=   8.7360345405136389E-002   3.0607827378376532E-005
+ DIV U  max mean=   4.4102189042485793E-006   1.3754155312301528E-007
+ U,V,W min=  -1.11052723E-05  -1.00341206E-02  -1.40428897E-02
+ U,V,W max=  0.999946296       1.17586004E-02   1.56809613E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00675392
+ CFL_z                  :        0.00100358
+ Phi1 min max=   0.00000000       1.52121806    
+ Time for this time step (s):  0.129813001    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     23/     25, Time unit =   0.2300
+ Mass balance: L-BC, R-BC,   19.648181   19.612813
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03539   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.612793
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03280    0.00013
+ DIV U* max mean=   8.7343703646938900E-002   3.0331186120858408E-005
+ DIV U  max mean=   4.4606267430624520E-006   1.2276651927514442E-007
+ U,V,W min=  -1.02812564E-05  -1.04835192E-02  -1.46483034E-02
+ U,V,W max=  0.999946296       1.22547057E-02   1.62851997E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00703847
+ CFL_z                  :        0.00104225
+ Phi1 min max=   0.00000000       1.55036438    
+ Time for this time step (s):  0.129155993    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     24/     25, Time unit =   0.2400
+ Mass balance: L-BC, R-BC,   19.648181   19.615397
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03280   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.615377
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03041    0.00012
+ DIV U* max mean=   8.7318872643463066E-002   3.0097528706221988E-005
+ DIV U  max mean=   4.5102302083012768E-006   1.3147325373698687E-007
+ U,V,W min=  -9.51329093E-06  -1.09323338E-02  -1.52489822E-02
+ U,V,W max=  0.999946296       1.27467029E-02   1.68753695E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00732064
+ CFL_z                  :        0.00108002
+ Phi1 min max=   0.00000000       1.57829404    
+ Time for this time step (s):  0.130336002    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     25/     25, Time unit =   0.2500
+ Mass balance: L-BC, R-BC,   19.648181   19.617787
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.03041   -0.00000
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.617769
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.02820    0.00011
+ DIV U* max mean=   8.7286062630429123E-002   2.9899356358784752E-005
+ DIV U  max mean=   4.5591916980597578E-006   1.4747922043280040E-007
+ U,V,W min=  -8.80148764E-06  -1.13805737E-02  -1.58448871E-02
+ U,V,W max=  0.999946296       1.32344905E-02   1.74511652E-02
+ CFL_x                  :        0.02559863
+ CFL_y                  :        0.00760040
+ CFL_z                  :        0.00111687
+ Phi1 min max=   0.00000000       1.60508668    
+ Time for this time step (s):  0.133689001    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+                                                            
+ Good job! Xcompact3d finished successfully!                
+                                                            
+ 2DECOMP with p_row*p_col=           0           0
+                                                            
+ nx*ny*nz=      532512
+ nx,ny,nz=         129         129          32
+ dx,dy,dz=  0.39062500000000000       0.15625000000000000       0.15625000000000000     
+                                                            
+ Averaged time per step (s):  0.131557196    
+ Total wallclock (s):   3.28892994    
+ Total wallclock (m):   5.48155010E-02
+ Total wallclock (h):   9.13591648E-04
+                                                            
