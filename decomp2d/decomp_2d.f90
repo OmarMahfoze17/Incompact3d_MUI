@@ -15,7 +15,7 @@
 module decomp_2d
 
   use MPI
-  
+
   implicit none
 
   private        ! Make everything private unless declared public
@@ -55,6 +55,7 @@ module decomp_2d
   integer, save, public :: DECOMP_2D_COMM_CART_X, &
        DECOMP_2D_COMM_CART_Y, DECOMP_2D_COMM_CART_Z 
   integer, save :: DECOMP_2D_COMM_ROW, DECOMP_2D_COMM_COL
+  integer, save,public :: MUI_COMM
 
   ! define neighboring blocks (to be used in halo-cell support)
   !  first dimension 1=X-pencil, 2=Y-pencil, 3=Z-pencil
@@ -303,7 +304,7 @@ contains
   !     all internal data structures initialised properly
   !     library ready to use
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  subroutine decomp_2d_init(nx,ny,nz,p_row,p_col,periodic_bc)
+  subroutine decomp_2d_init(nx,ny,nz,p_row,p_col,MUI_COMM_WORLD,periodic_bc)
     
     implicit none
 
@@ -311,11 +312,12 @@ contains
     logical, dimension(3), intent(IN), optional :: periodic_bc
 
     integer :: errorcode, ierror, row, col
+    integer :: MUI_COMM_WORLD
 
 #ifdef SHM_DEBUG
     character(len=80) fname
 #endif
-
+    MUI_COMM = MUI_COMM_WORLD
     nx_global = nx
     ny_global = ny
     nz_global = nz
@@ -354,16 +356,16 @@ contains
     dims(2) = col
     periodic(1) = periodic_y
     periodic(2) = periodic_z
-    call MPI_CART_CREATE(MPI_COMM_WORLD,2,dims,periodic, &
+    call MPI_CART_CREATE(MUI_COMM,2,dims,periodic, &
          .false., &  ! do not reorder rank
          DECOMP_2D_COMM_CART_X, ierror)
     periodic(1) = periodic_x
     periodic(2) = periodic_z
-    call MPI_CART_CREATE(MPI_COMM_WORLD,2,dims,periodic, &
+    call MPI_CART_CREATE(MUI_COMM,2,dims,periodic, &
          .false., DECOMP_2D_COMM_CART_Y, ierror)
     periodic(1) = periodic_x
     periodic(2) = periodic_y
-    call MPI_CART_CREATE(MPI_COMM_WORLD,2,dims,periodic, &
+    call MPI_CART_CREATE(MUI_COMM,2,dims,periodic, &
          .false., DECOMP_2D_COMM_CART_Z, ierror)
 
     call MPI_CART_COORDS(DECOMP_2D_COMM_CART_X,nrank,2,coord,ierror)
@@ -1394,7 +1396,7 @@ contains
 
     ! maxcor
     call MPI_ALLREDUCE(ncores, maxcor, 1, MPI_INTEGER, MPI_MAX, &
-         MPI_COMM_WORLD, ierror)
+    MUI_COMM, ierror)
 
     call FIPC_finalize(ierror)
 

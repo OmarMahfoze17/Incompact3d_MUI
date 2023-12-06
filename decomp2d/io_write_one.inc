@@ -54,7 +54,7 @@ endif
 call MPI_INFO_CREATE(info, ierror)
 gs = ceiling(real(sizes(1),mytype)*real(sizes(2),mytype)* &
      real(sizes(3),mytype)/1024./1024.)
-call t3pio_set_info(MPI_COMM_WORLD, info, "./", ierror, &
+call t3pio_set_info(MUI_COMM, info, "./", ierror, &
      GLOBAL_SIZE=gs, factor=1)
 #endif
 
@@ -62,10 +62,10 @@ call MPI_TYPE_CREATE_SUBARRAY(3, sizes, subsizes, starts,  &
      MPI_ORDER_FORTRAN, data_type, newtype, ierror)
 call MPI_TYPE_COMMIT(newtype,ierror)
 #ifdef T3PIO
-call MPI_FILE_OPEN(MPI_COMM_WORLD, filename, &
+call MPI_FILE_OPEN(MUI_COMM, filename, &
      MPI_MODE_CREATE+MPI_MODE_WRONLY, info, fh, ierror)
 #else
-call MPI_FILE_OPEN(MPI_COMM_WORLD, filename, &
+call MPI_FILE_OPEN(MUI_COMM, filename, &
      MPI_MODE_CREATE+MPI_MODE_WRONLY, MPI_INFO_NULL, &
      fh, ierror)
 #endif

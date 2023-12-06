@@ -17,6 +17,7 @@ module decomp_2d_io
 
   use decomp_2d
   use MPI
+!   use variables, only :  MUI_COMM  
 #ifdef T3PIO
   use t3pio
 #endif
@@ -136,7 +137,7 @@ contains
   !! TODO: make this a runtime-option
   adios2_debug_mode = .true.
 
-  call adios2_init(adios, trim(config_file), MPI_COMM_WORLD, adios2_debug_mode, ierror)
+  call adios2_init(adios, trim(config_file), MUI_COMM, adios2_debug_mode, ierror)
   if (ierror.ne.0) then
      print *, "Error initialising ADIOS2 - is adios2_config.xml present and valid?"
      call MPI_ABORT(MPI_COMM_WORLD, -1, ierror)
@@ -1402,7 +1403,7 @@ contains
     call MPI_TYPE_CREATE_SUBARRAY(4, sizes, subsizes, starts,  &
          MPI_ORDER_FORTRAN, real_type, newtype, ierror)
     call MPI_TYPE_COMMIT(newtype,ierror)
-    call MPI_FILE_OPEN(MPI_COMM_WORLD, filename, &
+    call MPI_FILE_OPEN(MUI_COMM, filename, &
          MPI_MODE_CREATE+MPI_MODE_WRONLY, MPI_INFO_NULL, &
          fh, ierror)
     filesize = 0_MPI_OFFSET_KIND
@@ -1468,7 +1469,7 @@ contains
           color = 2
        end if
     end if
-    call MPI_COMM_SPLIT(MPI_COMM_WORLD,color,key,newcomm,ierror)
+    call MPI_COMM_SPLIT(MUI_COMM,color,key,newcomm,ierror)
 
     if (color==1) then ! only ranks in this group do IO collectively
 
@@ -1727,7 +1728,7 @@ contains
 
           !! Open IO
 #ifndef ADIOS2
-          call MPI_FILE_OPEN(MPI_COMM_WORLD, io_dir, &
+          call MPI_FILE_OPEN(MUI_COMM, io_dir, &
                access_mode, MPI_INFO_NULL, &
                fh_registry(idx), ierror)
           if (mode .eq. decomp_2d_write_mode) then
