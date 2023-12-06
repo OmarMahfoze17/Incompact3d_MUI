@@ -17,6 +17,7 @@ module case
   use mixlayer
   use lockexch
   use tbl
+  use MUIcoupledBC
   use abl
   use uniform
   use sandbox
@@ -100,6 +101,10 @@ contains
 
        call init_tbl (ux1, uy1, uz1, ep1, phi1)
 
+    elseif (itype.eq.itype_MUIBC) then
+
+       call init_MUIBC (ux1, uy1, uz1, ep1, phi1)
+
     elseif (itype.eq.itype_abl) then
 
        call init_abl (ux1, uy1, uz1, ep1, phi1)
@@ -169,9 +174,7 @@ contains
        call boundary_conditions_tgv (ux, uy, uz, phi)
 
     elseif (itype.eq.itype_channel) then
-
        call boundary_conditions_channel (ux, uy, uz, phi)
-
     elseif (itype.eq.itype_hill) then
 
        call boundary_conditions_hill (ux,uy,uz,phi,ep)
@@ -191,6 +194,9 @@ contains
     elseif (itype.eq.itype_tbl) then
 
        call boundary_conditions_tbl (ux, uy, uz, phi)
+   elseif (itype.eq.itype_MUIBC) then
+
+   call boundary_conditions_MUIBC (ux, uy, uz, phi)
 
     elseif (itype.eq.itype_abl) then
 
@@ -211,6 +217,8 @@ contains
     elseif (itype.eq.itype_pipe) then
 
        call boundary_conditions_pipe (ux, uy, uz, phi)
+    else
+         print *, "boundary_conditions error"
 
     endif
 
@@ -357,6 +365,9 @@ contains
     elseif (itype.eq.itype_tbl) then
 
        call postprocess_tbl (ux, uy, uz, ep)
+    elseif (itype.eq.itype_MUIBC) then
+
+      call postprocess_MUIBC (ux, uy, uz, ep)
 
     elseif (itype.eq.itype_abl) then
 
@@ -416,6 +427,9 @@ contains
     else if (itype .eq. itype_tbl) then
 
        call visu_tbl_init(case_visu_init)
+    else if (itype .eq. itype_MUIBC) then
+
+      call visu_MUIBC_init(case_visu_init)
 
     else if (itype .eq. itype_lockexch) then
 
@@ -478,6 +492,11 @@ contains
 
        call visu_tbl(ux1, uy1, uz1, pp3, phi1, ep1, num)
        called_visu = .true.
+
+    elseif (itype.eq.itype_MUIBC) then
+
+      call visu_MUIBC(ux1, uy1, uz1, pp3, phi1, ep1, num)
+      called_visu = .true.
        
     elseif (itype.eq.itype_uniform) then
 
@@ -514,7 +533,6 @@ contains
     real(mytype), dimension(xsize(1), xsize(2), xsize(3), ntime) :: dux1, duy1, duz1
 
     if (itype.eq.itype_channel) then
-
        call momentum_forcing_channel(dux1, duy1, duz1, ux1, uy1, uz1)
 
 !!!    elseif (itype.eq.itype_jet) then
@@ -524,6 +542,7 @@ contains
     elseif (itype.eq.itype_abl) then
 
        call momentum_forcing_abl(dux1, duy1, duz1, ux1, uy1, uz1, phi1)
+
 
     endif
 

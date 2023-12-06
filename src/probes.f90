@@ -77,7 +77,7 @@ contains
     USE MPI
     USE param, only : dx, dy, dz, nclx, ncly, nclz, xlx, yly, zlz, istret, one, half
     USE param, only : irestart, ifirst
-    USE variables, only : nxm, ny, yp, nym, ypi, nzm, numscalar
+    USE variables, only : nxm, ny, yp, nym, ypi, nzm, numscalar,MUI_COMM_WORLD
 
     logical :: fexists
     integer :: i,j,code
@@ -105,7 +105,7 @@ contains
           endif
        endif
        ! Broadcast
-       call MPI_BCAST(main_probes_offset,1,MPI_INTEGER,0,MPI_COMM_WORLD,code)
+       call MPI_BCAST(main_probes_offset,1,MPI_INTEGER,0,MUI_COMM_WORLD,code)
 
        ! Extra probes
        if (flag_extra_probes) then
@@ -117,7 +117,7 @@ contains
              endif
           endif
           ! Broadcast
-          call MPI_BCAST(extra_probes_offset,1,MPI_INTEGER,0,MPI_COMM_WORLD,code)
+          call MPI_BCAST(extra_probes_offset,1,MPI_INTEGER,0,MUI_COMM_WORLD,code)
        endif
 
     endif

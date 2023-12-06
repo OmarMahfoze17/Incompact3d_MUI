@@ -25,6 +25,8 @@ subroutine filter(af)
   if (nclx1==1.and.nclxn==2) filx => filx_12
   if (nclx1==2.and.nclxn==1) filx => filx_21
   if (nclx1==2.and.nclxn==2) filx => filx_22
+  if (nclx1==3.and.nclxn==1) filx => filx_21
+  if (nclx1==3.and.nclxn==2) filx => filx_22
   !
   if (ncly1==0.and.nclyn==0) fily => fily_00
   if (ncly1==1.and.nclyn==1) fily => fily_11
@@ -153,7 +155,7 @@ subroutine set_filter_coefficients(af,alfa1,a1,b1,c1,d1,alfa2,a2,b2,c2,d2,alfa3,
      fc(2)   =one
      fb(1)   =alfai
      fb(2)   =alfai
-  elseif (ncl1.eq.2) then !Dirichlet
+  elseif (ncl1.eq.2 .or. ncl1.eq.3) then !Dirichlet
      ff(1)   =alfa1
      ff(2)   =alfa2
      fc(1)   =one

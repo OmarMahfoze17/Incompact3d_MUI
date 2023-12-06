@@ -308,8 +308,8 @@ contains
           tunstxl(xstart(3)-1+k)=tsumx
           tunstyl(xstart(3)-1+k)=tsumy
        enddo
-       call MPI_ALLREDUCE(tunstxl,tunstx,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(tunstyl,tunsty,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tunstxl,tunstx,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tunstyl,tunsty,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
 !!$!*********************************************************************************
 !!$!     Secondly, the surface momentum fluxes
@@ -475,12 +475,12 @@ contains
              tdiffyl(kk)=tdiffyl(kk)+fdiy
           enddo
        endif
-       call MPI_ALLREDUCE(tconvxl,tconvx,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(tconvyl,tconvy,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(tpresxl,tpresx,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(tpresyl,tpresy,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(tdiffxl,tdiffx,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(tdiffyl,tdiffy,nz,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tconvxl,tconvx,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tconvyl,tconvy,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tpresxl,tpresx,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tpresyl,tpresy,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tdiffxl,tdiffx,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(tdiffyl,tdiffy,nz,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
        do k=1,zsize(3)
 

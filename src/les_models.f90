@@ -294,10 +294,10 @@ contains
       nutmin = zero
       nutmax = zero
 
-      call MPI_ALLREDUCE(srtmin_loc,srtmin,1,real_type,MPI_MIN,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(nutmin_loc,nutmin,1,real_type,MPI_MIN,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(srtmax_loc,srtmax,1,real_type,MPI_MAX,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(nutmax_loc,nutmax,1,real_type,MPI_MAX,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(srtmin_loc,srtmin,1,real_type,MPI_MIN,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(nutmin_loc,nutmin,1,real_type,MPI_MIN,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(srtmax_loc,srtmax,1,real_type,MPI_MAX,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(nutmax_loc,nutmax,1,real_type,MPI_MAX,MUI_COMM_WORLD,ierr)
 
       if (mod(itime, ilist) == 0) then
          if (nrank==0) then 

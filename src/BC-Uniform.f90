@@ -207,8 +207,8 @@ contains
       enddo
     enddo
 
-    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MUI_COMM_WORLD,code)
 
     cx=0.5*(uxmax1+uxmin1)*gdt(itr)*udx
     do k=1,xsize(3)

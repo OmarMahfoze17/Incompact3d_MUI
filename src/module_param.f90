@@ -5,8 +5,14 @@
 module variables
   !USE param
   !USE var
+  use mpi
   use decomp_2d, only : mytype
-
+#ifdef MUI_COUPLING
+  ! Coupling varaibles 
+  use iso_c_binding
+  use mui_3d_f
+  use mui_general_f
+#endif
   ! Boundary conditions : ncl = 2 --> Dirichlet
   ! Boundary conditions : ncl = 1 --> Free-slip
   ! Boundary conditions : ncl = 0 --> Periodic
@@ -40,6 +46,29 @@ module variables
   integer,parameter :: prec = 8
 #endif
 #endif
+
+#ifdef MUI_COUPLING
+  ! Coupling varaibles 
+  character(len=1024) :: domainName
+  character(len=1024) :: interfaceName
+  character(len=1024) :: arg_interface_count
+  integer(c_int) :: interface_count
+  character(:), allocatable, target :: interfaces3d(:)
+  character(:), allocatable :: domain3d
+  integer :: interfaceDirection(200), interfaceLocation(200)
+  integer,allocatable,dimension(:) :: ifsDir,ifsLoc
+  type(c_ptr), target :: uniface_3d=c_null_ptr
+  type(c_ptr), target :: spatial_sampler=c_null_ptr
+  type(c_ptr), target :: temporal_sampler=c_null_ptr
+  real(c_double) :: tolerance=1e-37_c_double
+  ! integer(c_int) :: MUI_COMM_WORLD
+  integer(c_int) :: MUI_COMM_WORLD
+  integer :: MUI_x1_ID,MUI_xn_ID,MUI_y1_ID,MUI_yn_ID,MUI_z1_ID,MUI_zn_ID   
+  integer :: MUIBC_ID(6)
+
+  
+#endif
+
   !module filter
   real(mytype),dimension(200) :: idata
   real(mytype),allocatable,dimension(:) :: fiffx, fifcx, fifbx, fisfx, fiscx, fisbx,fifsx,fifwx,fissx,fiswx
@@ -285,7 +314,8 @@ module param
        itype_uniform = 11, &
        itype_sandbox = 12, &
        itype_cavity = 13, &
-       itype_pipe = 14
+       itype_pipe = 14, &
+       itype_MUIBC = 15
 
   integer :: cont_phi,itr,itime,itest,iprocessing
   integer :: ifft,istret,iforc_entree,iturb

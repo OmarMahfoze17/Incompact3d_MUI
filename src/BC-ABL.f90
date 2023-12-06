@@ -17,6 +17,7 @@ contains
     use variables
     use param
     use MPI
+    use variables, only :  MUI_COMM_WORLD
 
     implicit none
 
@@ -272,8 +273,8 @@ contains
       enddo
     enddo
 
-    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MUI_COMM_WORLD,code)
 
     cx=0.5*(uxmax1+uxmin1)*gdt(itr)*udx
     do k=1,xsize(3)
@@ -482,9 +483,9 @@ contains
       Phi_HAve_local=Phi_HAve_local
     endif
 
-    call MPI_ALLREDUCE(ux_HAve_local,ux_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uz_HAve_local,uz_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    if (iscalar==1) call MPI_ALLREDUCE(Phi_HAve_local,Phi_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ux_HAve_local,ux_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uz_HAve_local,uz_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    if (iscalar==1) call MPI_ALLREDUCE(Phi_HAve_local,Phi_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
     ux_HAve=ux_HAve/(nxc*nzc)
     uz_HAve=uz_HAve/(nxc*nzc)
@@ -608,10 +609,10 @@ contains
        L_HAve_local=L_HAve_local
        Q_HAve_local=Q_HAve_local
 
-       call MPI_ALLREDUCE(PsiM_HAve_local,PsiM_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(PsiH_HAve_local,PsiH_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(L_HAve_local,L_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(Q_HAve_local,Q_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(PsiM_HAve_local,PsiM_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(PsiH_HAve_local,PsiH_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(L_HAve_local,L_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(Q_HAve_local,Q_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
        PsiM_HAve=PsiM_HAve/(nxc*nzc)
        PsiH_HAve=PsiH_HAve/(nxc*nzc)
@@ -810,8 +811,8 @@ contains
     enddo
     ux_HAve_local=ux_HAve_local
     uz_HAve_local=uz_HAve_local
-    call MPI_ALLREDUCE(ux_HAve_local,ux_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uz_HAve_local,uz_HAve,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ux_HAve_local,ux_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uz_HAve_local,uz_HAve,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     ux_HAve=ux_HAve/(nxc*nzc)
     uz_HAve=uz_HAve/(nxc*nzc)
     S_HAve=sqrt_prec(ux_HAve**2.+uz_HAve**2.)
@@ -867,7 +868,7 @@ contains
     enddo
     ut3=ut3/ysize(1)/ysize(3)
 
-    call MPI_ALLREDUCE(ut3,ut4,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ut3,ut4,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     ut4=ut4/nproc
     if (iconcprec.eq.1) ut4=ut4*(xlx/pdl)
 
@@ -1153,13 +1154,13 @@ contains
       enddo
     enddo
 
-    call MPI_ALLREDUCE(u_HAve_local,u_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(v_HAve_local,v_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(w_HAve_local,w_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uxy_HAve_local,uxy_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uyz_HAve_local,uyz_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(txy_HAve_local,txy_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(tyz_HAve_local,tyz_HAve,ny,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(u_HAve_local,u_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(v_HAve_local,v_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(w_HAve_local,w_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxy_HAve_local,uxy_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uyz_HAve_local,uyz_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(txy_HAve_local,txy_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(tyz_HAve_local,tyz_HAve,ny,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     u_HAve  =  u_HAve/real(nx*nz,mytype)
     v_HAve  =  v_HAve/real(nx*nz,mytype)
     w_HAve  =  w_HAve/real(nx*nz,mytype)

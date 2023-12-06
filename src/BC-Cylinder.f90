@@ -160,8 +160,8 @@ contains
        enddo
     enddo
 
-    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MUI_COMM_WORLD,code)
 
     if (u1 == zero) then
        cx=(half*(uxmax1+uxmin1))*gdt(itr)*udx

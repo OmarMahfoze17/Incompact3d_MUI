@@ -27,7 +27,7 @@ module sandbox
   use decomp_2d, only : transpose_x_to_y, transpose_y_to_z, &
       transpose_z_to_y, transpose_y_to_x
 
-  use variables, only : numscalar
+  use variables, only : numscalar, MUI_COMM_WORLD
 
   use var, only : xnu, ri, uset, sc, Fr
   use var, only : gravx, gravy, gravz
@@ -247,8 +247,8 @@ contains
       enddo
     enddo
 
-    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmax,uxmax1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(uxmin,uxmin1,1,real_type,MPI_MIN,MUI_COMM_WORLD,code)
 
     if (u1.eq.zero) then
       cx=(half*(uxmax1+uxmin1))*gdt(itr)*udx
@@ -316,7 +316,7 @@ contains
 
     int = sum(tmp)
 
-    call MPI_ALLREDUCE(int,int1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(int,int1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
     if (nrank==0) write(*,*) "Integration at frc : ",int1
 
@@ -351,7 +351,7 @@ contains
 
     int = sum(tmp)
 
-    call MPI_ALLREDUCE(int,int1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(int,int1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
     if (nrank==0) write(*,*) "Integration at frc SZA : ",int1
 

@@ -31,12 +31,18 @@ subroutine parameter(input_i3d)
   use visu, only : output2D
   use forces, only : iforces, nvol, xld, xrd, yld, yud!, zld, zrd
 
+#ifdef MUI_COUPLING
+  ! Coupling varaibles 
+  use iso_c_binding
+  use mui_3d_f
+  use mui_general_f
+#endif
   implicit none
 
   character(len=80), intent(in) :: input_i3d
+  character(len=1024) :: numberSuffix
   real(mytype) :: theta, cfl,cf2
-  integer :: longueur ,impi,j, is, total
-
+  integer :: longueur ,impi,j, is, total, ifsIndx
   NAMELIST /BasicParam/ p_row, p_col, nx, ny, nz, istret, beta, xlx, yly, zlz, &
        itype, iin, re, u1, u2, init_noise, inflow_noise, &
        dt, ifirst, ilast, &
@@ -71,6 +77,9 @@ subroutine parameter(input_i3d)
   NAMELIST /CASE/ pfront
   NAMELIST/ALMParam/iturboutput,NTurbines,TurbinesPath,NActuatorlines,ActuatorlinesPath,eps_factor,rho_air
   NAMELIST/ADMParam/Ndiscs,ADMcoords,iturboutput,rho_air,T_relax
+  NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection,interfacelocation,MUIBC_ID
+
+
 
 #ifdef DEBG
   if (nrank == 0) write(*,*) '# parameter start'
@@ -98,6 +107,43 @@ subroutine parameter(input_i3d)
 
   !! These are the 'essential' parameters
   read(10, nml=BasicParam); rewind(10)
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+#ifdef MUI_COUPLING
+    
+   read(10, nml=MUICoupling); rewind(10)  
+  allocate(character(len_trim(interfaceName)+5) :: interfaces3d(interface_count))
+  !For multi-domain function, "uniface_pointers_1d" should be used to collect the array of
+  ! MUI uniface pointers. It is decleared in the MUI FORTRAN wrapper.
+  allocate(uniface_pointers_3d(interface_count),ifsDir(interface_count),ifsLoc(interface_count))
+
+  do ifsIndx = 1, interface_count
+   !Generate character type of number suffix
+   if (ifsIndx < 10) then
+       write (numberSuffix, "(I1)") ifsIndx
+   else if ((ifsIndx < 100) .and. (ifsIndx > 9)) then
+       write (numberSuffix, "(I2)") ifsIndx
+   else if ((ifsIndx < 1000) .and. (ifsIndx > 99)) then
+       write (numberSuffix, "(I3)") ifsIndx
+   else
+       write (numberSuffix, "(I4)") ifsIndx
+   endif
+
+   !Create and collect interface names
+   interfaces3d(ifsIndx) = trim(interfaceName) // "_" // trim(numberSuffix)
+   ifsDir(ifsIndx)=interfaceDirection(ifsIndx)
+   ifsLoc(ifsIndx)=interfaceLocation(ifsIndx)
+ end do 
+  call create_and_get_uniface_multi_3d_f(uniface_pointers_3d, trim(domainName), interfaces3d, interface_count)
+  call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
+  call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
+!   print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+!   print *, " Xcompact3d created the intereface"
+!   print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+#endif
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
   if (nz==1) then
      if (nrank==0) write(*,*) "Warning : support for 2D simulations is experimental"
      nclz1 = 0
@@ -205,7 +251,7 @@ subroutine parameter(input_i3d)
   if(ilesmod.ne.0) then
      read(10, nml=LESModel); rewind(10)
   endif
-  if (itype.eq.itype_tbl) then
+  if (itype.eq.itype_tbl .or. itype.eq.itype_MUIBC) then
      read(10, nml=Tripping); rewind(10)
   endif
   if (itype.eq.itype_abl) then
@@ -351,6 +397,8 @@ subroutine parameter(input_i3d)
         print *,'Sandbox'
      elseif (itype.eq.itype_cavity) then
         print *,'Cavity'  
+     elseif (itype.eq.itype_MUIBC) then
+         print *,'MUI coupled boundary condition'
      else
         print *,'Unknown itype: ', itype
         stop
@@ -532,7 +580,7 @@ subroutine parameter(input_i3d)
         else
            write(*,*)  "LMN boundedness    : Not enforced"
         endif
-        write(*,"(' dens1 and dens2    : ',F6.2' ',F6.2)") dens1, dens2
+      !   write(*,"(' dens1 and dens2    : ',F6.2' ',F6.2)") dens1, dens2
         write(*,"(' Prandtl number Re  : ',F15.8)") prandtl
      endif
      if (angle.ne.0.) write(*,"(' Solid rotation     : ',F6.2)") angle

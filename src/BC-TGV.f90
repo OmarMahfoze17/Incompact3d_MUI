@@ -320,7 +320,7 @@ contains
              enddo
           enddo
        enddo
-       call MPI_ALLREDUCE(temp1,enst,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(temp1,enst,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
        enst=enst/(nxc*nyc*nzc)
        
        !SPATIALLY-AVERAGED ENERGY DISSIPATION
@@ -338,7 +338,7 @@ contains
              enddo
           enddo
        enddo
-       call MPI_ALLREDUCE(temp1,eps,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(temp1,eps,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
        eps=eps/(nxc*nyc*nzc)
 
        !SPATIALLY-AVERAGED TKE of velocity fields
@@ -350,7 +350,7 @@ contains
              enddo
           enddo
        enddo
-       call MPI_ALLREDUCE(temp1,eek,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(temp1,eek,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
        eek=eek/(nxc*nyc*nzc)
 
        !SECOND DERIVATIVES
@@ -392,7 +392,7 @@ contains
              enddo
           enddo
        enddo
-       call MPI_ALLREDUCE(temp1,eps2,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(temp1,eps2,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
        eps2=eps2/(nxc*nyc*nzc)
        
        
@@ -528,7 +528,7 @@ contains
        mp(is)= sum(temp1)
     end do
 
-    call MPI_REDUCE(mp,mp1,numscalar,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(mp,mp1,numscalar,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
 
     return
   end subroutine suspended
@@ -895,9 +895,9 @@ contains
     enddo
 
     ! Parallel
-    call MPI_ALLREDUCE(ll1,l1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(ll2,l2,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-    call MPI_ALLREDUCE(llinf,linf,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ll1,l1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ll2,l2,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(llinf,linf,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
 
     ! Rescaling
     l1 = l1 / ntot

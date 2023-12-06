@@ -31,6 +31,8 @@ subroutine schemes()
   if (nclx1.eq.1.and.nclxn.eq.2) derx => derx_12
   if (nclx1.eq.2.and.nclxn.eq.1) derx => derx_21
   if (nclx1.eq.2.and.nclxn.eq.2) derx => derx_22
+  if (nclx1.eq.3.and.nclxn.eq.1) derx => derx_21
+  if (nclx1.eq.3.and.nclxn.eq.2) derx => derx_22
   !
   if (ncly1.eq.0.and.nclyn.eq.0) dery => dery_00
   if (ncly1.eq.1.and.nclyn.eq.1) dery => dery_11
@@ -50,6 +52,8 @@ subroutine schemes()
   if (nclx1.eq.1.and.nclxn.eq.2) derxx => derxx_12
   if (nclx1.eq.2.and.nclxn.eq.1) derxx => derxx_21
   if (nclx1.eq.2.and.nclxn.eq.2) derxx => derxx_22
+  if (nclx1.eq.3.and.nclxn.eq.1) derxx => derxx_21
+  if (nclx1.eq.3.and.nclxn.eq.2) derxx => derxx_22
   !y
   if (ncly1.eq.0.and.nclyn.eq.0) deryy => deryy_00
   if (ncly1.eq.1.and.nclyn.eq.1) deryy => deryy_11
@@ -329,7 +333,7 @@ subroutine first_derivative(alfa1,af1,bf1,cf1,df1,alfa2,af2,alfan,afn,bfn,&
      fc(2)   =one
      fb(1)   =alfai
      fb(2)   =alfai
-  elseif (ncl1.eq.2) then !Dirichlet
+  elseif (ncl1.eq.2 .or. ncl1.eq.3) then !Dirichlet
      ff(1)   =alfa1
      ff(2)   =alfa2
      fc(1)   =one
@@ -560,7 +564,7 @@ subroutine second_derivative(alsa1,as1,bs1,&
      sb(2)   =alsai
      sb(3)   =alsai
      sb(4)   =alsai
-  elseif (ncl1.eq.2) then !Dirichlet
+  elseif (ncl1.eq.2 .or. ncl1.eq.3) then !Dirichlet
      sf(1)   =alsa1
      sf(2)   =alsa2
      sf(3)   =alsa3
@@ -732,13 +736,13 @@ subroutine interpolation(dx,nxm,nx,nclx1,nclxn,&
   cfx6(nxm)=zero
   if (nclx1==0) ccx6(1)=two
   if (nclx1==1) ccx6(1)=one + alcaix6
-  if (nclx1==2) ccx6(1)=one + alcaix6
+  if (nclx1==2 .or. nclx1==3) ccx6(1)=one + alcaix6
   ccx6(2)=one
   ccx6(nxm-2)=one
   ccx6(nxm-1)=one
   if (nclxn==0) ccx6(nxm)=one + alcaix6*alcaix6
   if (nclxn==1) ccx6(nxm)=one + alcaix6
-  if (nclxn==2) ccx6(nxm)=one + alcaix6
+  if (nclx1==2 .or. nclx1==3) ccx6(nxm)=one + alcaix6
   cbx6(1)=alcaix6
   cbx6(2)=alcaix6
   cbx6(nxm-2)=alcaix6
@@ -778,7 +782,7 @@ subroutine interpolation(dx,nxm,nx,nclx1,nclxn,&
   cifx6(nxm)=zero
   if (nclx1==0) cicx6(1)=two
   if (nclx1==1) cicx6(1)=one + ailcaix6
-  if (nclx1==2) cicx6(1)=one + ailcaix6
+  if (nclx1==2 .or. nclx1==3) cicx6(1)=one + ailcaix6
   cicx6(2)=one
   cicx6(nxm-2)=one
   cicx6(nxm-1)=one

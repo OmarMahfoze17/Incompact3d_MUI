@@ -11,6 +11,7 @@ module actuator_line_source
     use dbg_schemes, only: sin_prec, sqrt_prec
     use actuator_line_model_utils
     use actuator_line_model
+    use variables, only :  MUI_COMM_WORLD
 
     implicit none
     real(mytype), save :: constant_epsilon, meshFactor, thicknessFactor,chordFactor
@@ -470,9 +471,9 @@ contains
          endif
       enddo
 
-      call MPI_ALLREDUCE(Su_part,Su,Nsource,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(Sv_part,Sv,Nsource,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(Sw_part,Sw,Nsource,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Su_part,Su,Nsource,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Sv_part,Sv,Nsource,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Sw_part,Sw,Nsource,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
 
       ! Zero the Source term at each time step
       FTx(:,:,:)=zero
@@ -520,7 +521,7 @@ contains
       enddo
 
       alm_proj_time=MPI_WTIME()-t1
-      call MPI_ALLREDUCE(alm_proj_time,t1,1,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(alm_proj_time,t1,1,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
 
       if (nrank==0.and.mod(itime,ilist)==0) then
          alm_proj_time=alm_proj_time/float(nproc)

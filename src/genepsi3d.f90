@@ -13,7 +13,7 @@ contains
     USE param, only : zero, one, dx, dz
     USE decomp_2d, only : xstart, xend, xsize, mytype, nrank
     !USE decomp_2d_io
-    USE variables, only : yp, ny
+    USE variables, only : yp, ny, MUI_COMM_WORLD
 
     implicit none
     real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ep1
@@ -155,6 +155,7 @@ contains
     use param, only : zero,half, one, two
     use decomp_2d
     use MPI
+    use variables, only :  MUI_COMM_WORLD
     implicit none
     !
     real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ep1,smoofun,fbcx,fbcy,fbcz
@@ -253,7 +254,7 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(nobjxmax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(nobjxmax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        nobjxmax=',mpi_aux_i
 
     nobjxraf(:,:)=0
@@ -281,9 +282,9 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(nobjxmaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(nobjxmaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        nobjxmaxraf=',mpi_aux_i
-    call MPI_REDUCE(ibug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(ibug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        ibug=',mpi_aux_i
     ! if (nrank==0) print*,'    step 5'
 
@@ -309,7 +310,7 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(nobjymax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(nobjymax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        nobjymax=',mpi_aux_i
 
     nobjyraf(:,:)=0
@@ -337,9 +338,9 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(nobjymaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(nobjymaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        nobjymaxraf=',mpi_aux_i
-    call MPI_REDUCE(jbug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(jbug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        jbug=',mpi_aux_i
     ! if (nrank==0) print*,'    step 6'
 
@@ -365,7 +366,7 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(nobjzmax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(nobjzmax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        nobjzmax=',mpi_aux_i
 
     nobjzraf(:,:)=0
@@ -393,9 +394,9 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(nobjzmaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(nobjzmaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        nobjzmaxraf=',mpi_aux_i
-    call MPI_REDUCE(kbug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(kbug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
     ! if (nrank==0) print*,'        kbug=',mpi_aux_i
     ! if (nrank==0) print*,'    step 7'
 
@@ -613,7 +614,7 @@ contains
     use decomp_2d
     use param, only: zero, one
     use MPI
-
+    use variables, only :  MUI_COMM_WORLD
     implicit none
     !
     integer                            :: nx,ny,nz,nobjmax
@@ -668,7 +669,7 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(ising,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(ising,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
     !if (nrank==0) write(*,*) '        number of points with potential problem in X :',mpi_aux_i
     !if (nrank==0) write(*,*) '    step 11'
 
@@ -711,7 +712,7 @@ contains
           endif
        enddo
     enddo
-    call MPI_REDUCE(jsing,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(jsing,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
     !if (nrank==0) write(*,*) '        number of points with potential problem in Y :',mpi_aux_i
     !if (nrank==0) write(*,*) '    step 12'
 
@@ -755,7 +756,7 @@ contains
              endif
           enddo
        enddo
-       call MPI_REDUCE(ksing,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MPI_COMM_WORLD,code)
+       call MPI_REDUCE(ksing,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
        !if (nrank==0) write(*,*) '        number of points with potential problem in Z :',mpi_aux_i
     endif
     !if (nrank==0) write(*,*) '    step 13'

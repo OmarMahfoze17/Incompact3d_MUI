@@ -16,6 +16,7 @@ program xcompact3d
   use ibm_param
   use ibm, only : body
   use genepsi, only : genepsi3d
+  use MUIcoupledBC, only : pushMUI
 
   implicit none
 
@@ -25,24 +26,20 @@ program xcompact3d
   do itime=ifirst,ilast
      !t=itime*dt
      t=t0 + (itime0 + itime + 1 - ifirst)*dt
-     call simu_stats(2)
-
+     call simu_stats(2)    ! screen/log output
      if (iturbine.ne.0) call compute_turbines(ux1, uy1, uz1)
 
      if (iin.eq.3.and.mod(itime,ntimesteps)==1) then
         call read_inflow(ux_inflow,uy_inflow,uz_inflow,itime/ntimesteps)
      endif
-
      if ((itype.eq.itype_abl.or.iturbine.ne.0).and.(ifilter.ne.0).and.(ilesmod.ne.0)) then
         call filter(C_filter)
         call apply_spatial_filter(ux1,uy1,uz1,phi1)
      endif
-
+     
      do itr=1,iadvance_time
-
         call set_fluid_properties(rho1,mu1)
         call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
-
         if (imove.eq.1) then ! update epsi for moving objects
           if ((iibm.eq.2).or.(iibm.eq.3)) then
              call genepsi3d(ep1)
@@ -54,19 +51,15 @@ program xcompact3d
 #ifdef DEBG
         call check_transients()
 #endif
-        
         if (ilmn) then
            !! XXX N.B. from this point, X-pencil velocity arrays contain momentum (LMN only).
            call velocity_to_momentum(rho1,ux1,uy1,uz1)
         endif
-
         call int_time(rho1,ux1,uy1,uz1,phi1,drho1,dux1,duy1,duz1,dphi1)
         call pre_correc(ux1,uy1,uz1,ep1)
-
         call calc_divu_constraint(divu3,rho1,phi1)
         call solve_poisson(pp3,px1,py1,pz1,rho1,ux1,uy1,uz1,ep1,drho1,divu3)
         call cor_vel(ux1,uy1,uz1,px1,py1,pz1)
-
         if (ilmn) then
            call momentum_to_velocity(rho1,ux1,uy1,uz1)
            !! XXX N.B. from this point, X-pencil velocity arrays contain velocity (LMN only).
@@ -75,11 +68,14 @@ program xcompact3d
         
         call test_flow(rho1,ux1,uy1,uz1,phi1,ep1,drho1,divu3)
 
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        !!!!     ADD the data send call !!!!!!!!!!!!!!!!!!!!!!!!
+        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      enddo !! End sub timesteps
-
+     call pushMUI(ux1, uy1, uz1)
      call restart(ux1,uy1,uz1,dux1,duy1,duz1,ep1,pp3(:,:,:,1),phi1,dphi1,px1,py1,pz1,rho1,drho1,mu1,1)
 
-     call simu_stats(3)
+     call simu_stats(3) ! screen/log output
 
      call postprocessing(rho1,ux1,uy1,uz1,pp3,phi1,ep1)
 
@@ -92,13 +88,24 @@ end program xcompact3d
 !########################################################################
 subroutine init_xcompact3d()
 
-  use MPI
+  use mpi
   use decomp_2d
   use decomp_2d_io, only : decomp_2d_io_init
   USE decomp_2d_poisson, ONLY : decomp_2d_poisson_init
   use case
   use sandbox, only : init_sandbox
   use forces
+
+!   use iso_c_binding
+#ifdef MUI_COUPLING
+use mpi_f08 , only : MPI_comm
+  use iso_c_binding 
+  use mui_3d_f
+  use mui_general_f
+  use variables, only :  MUI_COMM_WORLD, uniface_3d
+  
+  
+#endif
 
   use var
 
@@ -114,6 +121,7 @@ subroutine init_xcompact3d()
   use variables, only : nx, ny, nz, nxm, nym, nzm
   use variables, only : p_row, p_col
   use variables, only : nstat, nvisu, nprobe, ilist
+  
 
   use les, only: init_explicit_les
   use turbine, only: init_turbines
@@ -132,12 +140,22 @@ subroutine init_xcompact3d()
   integer :: nargin, FNLength, status, DecInd
   logical :: back
   character(len=80) :: InputFN, FNBase
-    
-  !! Initialise MPI
-  call MPI_INIT(ierr)
-  call MPI_COMM_RANK(MPI_COMM_WORLD,nrank,ierr)
-  call MPI_COMM_SIZE(MPI_COMM_WORLD,nproc,ierr)
 
+  character(:), allocatable :: uri
+  TYPE(MPI_Comm) , pointer :: newcomm
+  integer(C_SIZE_T) :: strlen=8
+  !! Initialise MPI
+!   
+#ifdef MUI_COUPLING
+   ! call MPI_INIT(ierr)
+   call mui_mpi_split_by_app_f(MUI_COMM_WORLD)
+#else
+  call MPI_INIT(ierr)
+#endif
+  call MPI_COMM_RANK(MUI_COMM_WORLD,nrank,ierr) 
+  call MPI_COMM_SIZE(MUI_COMM_WORLD,nproc,ierr)
+
+  print *,  " xxxx " , nrank , nproc,MUI_COMM_WORLD
   ! Handle input file like a boss -- GD
   nargin=command_argument_count()
   if (nargin <1) then
@@ -168,7 +186,7 @@ subroutine init_xcompact3d()
   
   call parameter(InputFN)
 
-  call decomp_2d_init(nx,ny,nz,p_row,p_col)
+  call decomp_2d_init(nx,ny,nz,p_row,p_col,MUI_COMM_WORLD)
   call decomp_2d_io_init()
   call init_coarser_mesh_statS(nstat,nstat,nstat,.true.)    !start from 1 == true
   call init_coarser_mesh_statV(nvisu,nvisu,nvisu,.true.)    !start from 1 == true
@@ -316,15 +334,15 @@ subroutine check_transients()
   integer :: code
    
   dep=maxval(abs(dux1))
-  call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
+  call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
   if (nrank == 0) write(*,*)'## MAX dux1 ', dep1
  
   dep=maxval(abs(duy1))
-  call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
+  call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
   if (nrank == 0) write(*,*)'## MAX duy1 ', dep1
  
   dep=maxval(abs(duz1))
-  call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MPI_COMM_WORLD,code)
+  call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
   if (nrank == 0) write(*,*)'## MAX duz1 ', dep1
   
 end subroutine check_transients

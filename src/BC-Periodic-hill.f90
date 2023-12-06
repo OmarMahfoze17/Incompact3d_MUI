@@ -257,7 +257,7 @@ contains
     enddo
     ut3=ut3/(real(nx*nz,mytype))
 
-    call MPI_ALLREDUCE(ut3,ut4,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ut3,ut4,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     
     can=-(constant-ut4)
 

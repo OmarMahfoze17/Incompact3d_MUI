@@ -46,6 +46,7 @@ contains
       use decomp_2d
       use decomp_2d_io
       use MPI
+      use variables, only :  MUI_COMM_WORLD
 
       implicit none
       integer, intent(in) :: Ndiscs
@@ -132,7 +133,7 @@ contains
                enddo
             enddo
          
-            call MPI_ALLREDUCE(GammaDisc_partial,GammaDisc_tot,1,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
+            call MPI_ALLREDUCE(GammaDisc_partial,GammaDisc_tot,1,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
             GammaDisc(:,:,:,idisc)=GammaDisc(:,:,:,idisc)/GammaDisc_tot
             !if (nrank==0) then
             !   write(*,*) 'Disc thickness :', disc_thick
@@ -169,7 +170,7 @@ contains
       use MPI
       use param, only: dx, dy, dz, dt, itime, initstat, rho_air, T_relax, dBL, ustar
       use var, only: Fdiscx, Fdiscy, Fdiscz, GammaDisc
-        
+      use variables, only :  MUI_COMM_WORLD
       implicit none
       real(mytype), dimension(xsize(1),xsize(2),xsize(3)) :: ux1, uy1, uz1       
       real(mytype) :: uave, CTprime, alpha_relax
@@ -194,7 +195,7 @@ contains
          enddo
          Udisc_partial(idisc)=uave
       enddo
-      call MPI_ALLREDUCE(Udisc_partial,actuatordisc%Udisc,Nad,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Udisc_partial,actuatordisc%Udisc,Nad,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
 
       deallocate(Udisc_partial)
 

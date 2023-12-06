@@ -1095,7 +1095,7 @@ contains
     end do
 #ifdef DEBG
     dep=maxval(abs(rw2b))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Start rw2 ', dep1
 #endif
 
@@ -1114,7 +1114,7 @@ contains
     end do
 #ifdef DEBG
     dep=maxval(abs(rw1b))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Start rw1 ', dep1
 #endif
 
@@ -1150,7 +1150,7 @@ contains
     end do
 #ifdef DEBG
     dep=maxval(abs(cw1))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Post in Z cw1 ', dep1
 #endif
 
@@ -1180,7 +1180,7 @@ contains
     end do
 #ifdef DEBG
     dep=maxval(abs(cw2))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Post in Y cw2 ', dep1
 #endif
 
@@ -1188,7 +1188,7 @@ contains
     call transpose_y_to_x(cw2b,cw1,sp)
 #ifdef DEBUG
     dep=maxval(abs(cw1))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Back to X cw1 ', dep1
 #endif
 
@@ -1216,7 +1216,7 @@ contains
     end do
 #ifdef DEBUG
     dep=maxval(abs(cw1b))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Back to X cw1b ', cw1b
 #endif
 
@@ -1246,7 +1246,7 @@ contains
        end do
 #ifdef DEBUG
        dep=maxval(abs(cw1b))
-       call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
        if (nrank == 0) write(*,*)'## Poisson11X Solve Pois istret 0 ', dep1
 #endif
 
@@ -1317,7 +1317,7 @@ contains
           enddo
 #ifdef DEBUG
           dep=maxval(abs(cw2b))
-          call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+          call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
           if (nrank == 0) write(*,*)'## Poisson11X Solve Pois istret < 3 ', dep1
 #endif
        else
@@ -1342,7 +1342,7 @@ contains
        endif
 #ifdef DEBUG
        dep=maxval(abs(cw2b))
-       call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
        if (nrank == 0) write(*,*)'## Poisson11X Solve Pois istret = 3 ', dep1
 #endif
        !we have to go back in X pencils
@@ -1351,7 +1351,7 @@ contains
 
 #ifdef DEBUG
     dep=maxval(abs(cw1b))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Solve Pois AFTER ', dep1
 #endif
     !stop
@@ -1380,7 +1380,7 @@ contains
     end do
 #ifdef DEBUG
     dep=maxval(abs(cw1))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Solve Pois POSTPR X ', dep1
 #endif
 
@@ -1410,7 +1410,7 @@ contains
     end do
 #ifdef DEBUG
     dep=maxval(abs(cw2b))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Solve Pois POSTPR Y ', dep1
 #endif
     ! back to X-pencil
@@ -1429,7 +1429,7 @@ contains
     end do
 #ifdef DEBUG
     dep=maxval(abs(cw1))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Solve Pois POSTPR Z ', dep1
 #endif
 
@@ -1437,7 +1437,7 @@ contains
     call decomp_2d_fft_3d(cw1,rhs)
 #ifdef DEBUG
     dep=maxval(abs(rhs))
-    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
     if (nrank == 0) write(*,*)'## Poisson11X Solve Pois Back Phy RHS ', dep1
 #endif
 

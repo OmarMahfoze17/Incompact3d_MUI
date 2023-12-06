@@ -56,7 +56,7 @@ contains
       phimaxin(:,is) =  (/phimin, phimax /)
     enddo
 
-    call MPI_REDUCE(phimaxin,phimaxout,numscalar*2,real_type,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(phimaxin,phimaxout,numscalar*2,real_type,MPI_MAX,0,MUI_COMM_WORLD,code)
 
     do is=1,numscalar
       if (nrank == 0) then
@@ -67,7 +67,7 @@ contains
 
         if (abs_prec(phimax1) > 100._mytype) then !if phi control turned off
            write(*,*) 'Scalar diverged! SIMULATION IS STOPPED!'
-           call MPI_ABORT(MPI_COMM_WORLD,code,ierror); stop
+           call MPI_ABORT(MUI_COMM_WORLD,code,ierror); stop
         endif
       endif
     enddo
@@ -110,7 +110,7 @@ contains
     uzmin=-minval(uz)
 
     umaxin = (/uxmax, uymax, uzmax, uxmin, uymin, uzmin/)
-    call MPI_REDUCE(umaxin,umaxout,6,real_type,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(umaxin,umaxout,6,real_type,MPI_MAX,0,MUI_COMM_WORLD,code)
 
     uxmax1= umaxout(1)
     uymax1= umaxout(2)
@@ -791,7 +791,7 @@ contains
     use param, only : dx,dy,dz,dt,istret
     use decomp_2d, only : nrank, mytype, xsize, xstart, xend, real_type
     use mpi
-    use variables, only : dyp
+    use variables, only : dyp,MUI_COMM_WORLD
 
     implicit none
 
@@ -836,7 +836,7 @@ contains
 
     cflmax_in =  (/maxvalue_x, maxvalue_y, maxvalue_z, maxvalue_sum/)
 
-    call    MPI_REDUCE(cflmax_in,cflmax_out,4,real_type,MPI_MAX,0,MPI_COMM_WORLD,code)
+    call    MPI_REDUCE(cflmax_in,cflmax_out,4,real_type,MPI_MAX,0,MUI_COMM_WORLD,code)
 
     if (nrank == 0) then
       write(*,"(' CFL_x                  : ',F17.8)") cflmax_out(1) * dt
@@ -932,7 +932,7 @@ contains
     use MPI
     use decomp_2d, only : nrank, decomp_2d_abort
     use decomp_2d_io, only : gen_iodir_name
-    
+    use variables, only :  MUI_COMM_WORLD
     character(len=*), intent(in) :: oldname
     character(len=*), intent(in) :: newname
     integer, intent(in), optional :: opt_rank
@@ -960,7 +960,7 @@ contains
        end if
     end if
 
-    call MPI_Barrier(MPI_COMM_WORLD, ierror)
+    call MPI_Barrier(MUI_COMM_WORLD, ierror)
     if (ierror /= 0) then
        call decomp_2d_abort(ierror, &
             "Error in MPI_Barrier!")
@@ -976,7 +976,7 @@ contains
 
     use MPI
     use decomp_2d, only : nrank, decomp_2d_abort
-    
+    use variables, only :  MUI_COMM_WORLD
     character(len=*), intent(in) :: name
     integer, intent(in), optional :: opt_rank
 
@@ -1010,7 +1010,7 @@ contains
        end if
     end if
 
-    call MPI_Barrier(MPI_COMM_WORLD, ierror)
+    call MPI_Barrier(MUI_COMM_WORLD, ierror)
     if (ierror /= 0) then
        call decomp_2d_abort(ierror, &
             "Error in MPI_Barrier!")
@@ -1029,6 +1029,7 @@ contains
     use MPI
     use decomp_2d, only : nrank, decomp_2d_abort
     use decomp_2d_io, only : gen_iodir_name
+    use variables, only :  MUI_COMM_WORLD
     
     character(len=*), intent(in) :: refname
     character(len=*), intent(in) :: testname
@@ -1080,7 +1081,7 @@ contains
        end if
     end if
 
-    call MPI_Bcast(success, 1, MPI_LOGICAL, exe_rank, MPI_COMM_WORLD, ierror)
+    call MPI_Bcast(success, 1, MPI_LOGICAL, exe_rank, MUI_COMM_WORLD, ierror)
     if (ierror /= 0) then
        call decomp_2d_abort(ierror, &
             "Error in MPI_Allreduce")
@@ -1653,7 +1654,7 @@ subroutine tripping(tb,ta)
 
      !DEBUG:
      !call random_number(randx)
-     !call MPI_BCAST(randx,1,real_type,0,MPI_COMM_WORLD,code)
+     !call MPI_BCAST(randx,1,real_type,0,MUI_COMM_WORLD,code)
      !write(*,*) 'RANDOM:', nrank, randx, ii
      !First random generation of h_nxt
 
@@ -1668,7 +1669,7 @@ subroutine tripping(tb,ta)
 
   !Initialization h_nxt  (always bounded by xsize(3)^2 operations)
   if (itime == ifirst) then
-     call MPI_BCAST(h_coeff,z_modes,real_type,0,MPI_COMM_WORLD,code)
+     call MPI_BCAST(h_coeff,z_modes,real_type,0,MUI_COMM_WORLD,code)
      nxt_itr=0
      do k=1,xsize(3)
         h_nxt(k)=zero
@@ -1696,7 +1697,7 @@ subroutine tripping(tb,ta)
         h_coeff=h_coeff/sqrt_prec(real(z_modes,mytype)) !Non-dimensionalization
      end if
 
-     call MPI_BCAST(h_coeff,z_modes,real_type,0,MPI_COMM_WORLD,code)
+     call MPI_BCAST(h_coeff,z_modes,real_type,0,MUI_COMM_WORLD,code)
 
 
      !Initialization h_nxt  (always bounded by z_steps^2 operations)
@@ -1799,11 +1800,11 @@ subroutine tbl_tripping(tb,ta)
 
   !Initialization h_nxt  (always bounded by xsize(3)^2 operations)
   if (itime == ifirst) then
-     call MPI_BCAST(h_coeff1,z_modes,real_type,0,MPI_COMM_WORLD,code)
-     call MPI_BCAST(phase1,z_modes,real_type,0,MPI_COMM_WORLD,code)
-     call MPI_BCAST(h_coeff2,z_modes,real_type,0,MPI_COMM_WORLD,code)
-     call MPI_BCAST(phase2,z_modes,real_type,0,MPI_COMM_WORLD,code)
-     call MPI_BCAST(nxt_itr,1,mpi_int,0,MPI_COMM_WORLD,code)
+     call MPI_BCAST(h_coeff1,z_modes,real_type,0,MUI_COMM_WORLD,code)
+     call MPI_BCAST(phase1,z_modes,real_type,0,MUI_COMM_WORLD,code)
+     call MPI_BCAST(h_coeff2,z_modes,real_type,0,MUI_COMM_WORLD,code)
+     call MPI_BCAST(phase2,z_modes,real_type,0,MUI_COMM_WORLD,code)
+     call MPI_BCAST(nxt_itr,1,mpi_int,0,MUI_COMM_WORLD,code)
 
      do k=1,xsize(3)
         h_1(k)=zero
@@ -1833,8 +1834,8 @@ subroutine tbl_tripping(tb,ta)
         enddo
      end if
 
-     call MPI_BCAST(h_coeff1,z_modes,real_type,0,MPI_COMM_WORLD,code)
-     call MPI_BCAST(phase1,z_modes,real_type,0,MPI_COMM_WORLD,code)
+     call MPI_BCAST(h_coeff1,z_modes,real_type,0,MUI_COMM_WORLD,code)
+     call MPI_BCAST(phase1,z_modes,real_type,0,MUI_COMM_WORLD,code)
 
      !Initialization h_nxt  (always bounded by z_steps^2 operations)
      do k=1,xsize(3)
@@ -1866,7 +1867,7 @@ subroutine tbl_tripping(tb,ta)
      enddo
   enddo
 
-  call MPI_BARRIER(MPI_COMM_WORLD,code)
+  call MPI_BARRIER(MUI_COMM_WORLD,code)
   !if (nrank==0) write(*,*) maxval(ta(:,:,:)),minval(ta), z_modes
 
   return
@@ -2021,9 +2022,9 @@ subroutine test_min_max(name,text,array_tmp,i_size_array_tmp)
     tot_tmp=tot_tmp + array_tmp(i)
     min_tmp=min(min_tmp,array_tmp(i))
   enddo
-  call MPI_ALLREDUCE(max_tmp,max_tot,1,real_type,MPI_MAX,MPI_COMM_WORLD,ierror)
-  call MPI_ALLREDUCE(min_tmp,min_tot,1,real_type,MPI_MIN,MPI_COMM_WORLD,ierror)
-  call MPI_ALLREDUCE(tot_tmp,tot_tot,1,real_type,MPI_SUM,MPI_COMM_WORLD,ierror)
+  call MPI_ALLREDUCE(max_tmp,max_tot,1,real_type,MPI_MAX,MUI_COMM_WORLD,ierror)
+  call MPI_ALLREDUCE(min_tmp,min_tot,1,real_type,MPI_MIN,MUI_COMM_WORLD,ierror)
+  call MPI_ALLREDUCE(tot_tmp,tot_tot,1,real_type,MPI_SUM,MUI_COMM_WORLD,ierror)
   if (nrank == 0) then
      write(*,*) " "
      write(*,*) trim(text)//' Max ',name,max_tot

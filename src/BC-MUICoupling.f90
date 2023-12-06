@@ -2,11 +2,12 @@
 !This file is part of Xcompact3d (xcompact3d.com)
 !SPDX-License-Identifier: BSD 3-Clause
 
-module tbl
+module MUIcoupledBC
 
   use decomp_2d
   use variables
   use param
+  use tbl, only :blasius
 
   implicit none
 
@@ -15,16 +16,21 @@ module tbl
   character(len=1),parameter :: NL=char(10) !new line character
 
   PRIVATE ! All functions/subroutines private by default
-  PUBLIC :: blasius,init_tbl, boundary_conditions_tbl, postprocess_tbl, visu_tbl, visu_tbl_init
+  PUBLIC :: init_MUIBC, boundary_conditions_MUIBC, postprocess_MUIBC, &
+  visu_MUIBC, visu_MUIBC_init, pushMUI
 
 contains
 
-  subroutine init_tbl (ux1,uy1,uz1,ep1,phi1)
+  subroutine init_MUIBC (ux1,uy1,uz1,ep1,phi1)
 
     use decomp_2d_io
     use param , only : zptwofive
     use MPI
 
+   !  coupling variables 
+    use iso_c_binding
+    use mui_3d_f
+    use mui_general_f
 
     implicit none
 
@@ -36,6 +42,9 @@ contains
     integer :: k,j,i,ierror,ii,is,it,code
 
     integer, dimension (:), allocatable :: seed
+
+
+
 
     if (iscalar==1) then
 
@@ -52,7 +61,14 @@ contains
     ux1=zero;uy1=zero;uz1=zero
 
     !a blasius profile is created in ecoule and then duplicated for the all domain
-    call blasius()
+    if (nclx1==2) then ! Use the orignial TBL inlet conditions 
+      call blasius()   
+    elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
+      call recieveMUIBC()
+    else
+      print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
+      stop
+    endif
 
     do k=1,xsize(3)
        do j=1,xsize(2)
@@ -69,9 +85,9 @@ contains
 #endif
 
     return
-  end subroutine init_tbl
+  end subroutine init_MUIBC
   !********************************************************************
-  subroutine boundary_conditions_tbl (ux,uy,uz,phi)
+  subroutine boundary_conditions_MUIBC (ux,uy,uz,phi)
 
     use navier, only : tbl_flrt
     use param , only : zero, zptwofive
@@ -87,7 +103,17 @@ contains
     integer :: i, j, k, is
 
     !INFLOW with an update of bxx1, byy1 and bzz1 at the inlet
-    call blasius()
+    if (nclx1==2) then ! Use the orignial TBL inlet conditions 
+      call blasius()
+    elseif (nclx1==3) then ! Use the orignial get inlet conditions from MUI interface 
+      call recieveMUIBC()
+    else
+      print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
+      stop
+    endif
+    
+   !  
+    
     !INLET FOR SCALAR, TO BE CONSISTENT WITH INITIAL CONDITION
     if (iscalar==1) then
        do k=1,xsize(3)
@@ -163,12 +189,17 @@ contains
     call tbl_flrt(ux,uy,uz)
 
     return
-  end subroutine boundary_conditions_tbl
+  end subroutine boundary_conditions_MUIBC
 
   !********************************************************************
   !********************************************************************
-  subroutine blasius()
-
+  subroutine recieveMUIBC()
+#ifdef MUI_COUPLING
+  ! Coupling varaibles 
+    use iso_c_binding
+    use mui_3d_f
+    use mui_general_f
+#endif
     use decomp_2d_io
     use MPI
     use param, only : zero, zptwo, zpeight, one, nine
@@ -179,127 +210,161 @@ contains
     real(mytype) :: eta_bl, f_bl, g_bl, x_bl,h_bl
     real(mytype) :: delta_int, delta_eta, eps_eta
 
-
-    real(mytype) :: x, y, z
+    real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z
     integer :: i, j, k, is
 
-    do k=1,xsize(3)
-       do j=1,xsize(2)
-          if (istret.eq.0) y=real(j+xstart(2)-1-1,mytype)*dy
-          if (istret.ne.0) y=yp(j+xstart(2)-1)
+    print *, "Fetched 3D interface values at time  ",t
+    do k = 1, xsize(3)
+      do j = 1, xsize(2)
+         point_x = 0.0_mytype
+         point_y = yp(j+xstart(2)-1)
+         point_z = real((k+xstart(3)-1-1),mytype)*dz
+         
+         call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
+         point_z, t, spatial_sampler, temporal_sampler, bxx1(j,k))
 
-          eta_bl=y*real(4.91,mytype)/nine
+         call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, point_x, point_y, &
+         point_z, t, spatial_sampler, temporal_sampler, bxy1(j,k))
 
-          !OLD POLYNOMIAL FITTING
+         call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
+         point_z, t, spatial_sampler, temporal_sampler, bxz1(j,k))
 
-          delta_eta=zero
-          eps_eta=zero
-          delta_int=zptwo
+      end do
+   end do
 
-          if (eta_bl>=(real(7.5,mytype)/nine)) then
-             delta_eta=eta_bl-real(7.5,mytype)/nine
-             eta_bl=real(7.5,mytype)/nine
-             eps_eta=real(0.00015,mytype)
-          end if
+    
+end subroutine recieveMUIBC
 
-          f_bl=1678.64209592595000_mytype*eta_bl**14-11089.69250174290_mytype*eta_bl**13 &
-               +31996.435014067000_mytype*eta_bl**12-52671.52497797990_mytype*eta_bl**11 &
-               +54176.169116766700_mytype*eta_bl**10-35842.82047060970_mytype*eta_bl**9  &
-               +15201.308887124000_mytype*eta_bl**8 -4080.171379356480_mytype*eta_bl**7  &
-               +702.12963452810300_mytype*eta_bl**6 -56.20639258053180_mytype*eta_bl**5  &
-               -17.018112827391400_mytype*eta_bl**4 +0.819582894357566_mytype*eta_bl**3  &
-               -0.0601348202321954_mytype*eta_bl**2 +2.989739912704050_mytype*eta_bl**1
-
-          f_bl=f_bl+(1-exp_prec(-delta_eta/delta_int))*eps_eta
-
-
-
-          if (eta_bl >= (7.15_mytype/nine)) then
-             delta_int=zpeight
-             delta_eta=eta_bl-7.15_mytype/nine
-             eta_bl   =       7.15_mytype/nine
-             eps_eta  =     0.0005_mytype
-          end if
-
-          g_bl=4924.052847797540_mytype*eta_bl**14-34686.2970972733000_mytype*eta_bl**13 &
-               +108130.253843618_mytype*eta_bl**12-195823.099139525000_mytype*eta_bl**11 &
-               +227305.908339065_mytype*eta_bl**10-176106.001047617000_mytype*eta_bl**9  &
-               +92234.5885895112_mytype*eta_bl**8 -32700.3687158807000_mytype*eta_bl**7  &
-               +7923.51008739107_mytype*eta_bl**6 -1331.09245288739000_mytype*eta_bl**5  &
-               +130.109496961069_mytype*eta_bl**4 -7.64507811014497000_mytype*eta_bl**3  &
-               +6.94303207046209_mytype*eta_bl**2 -0.00209716712558639_mytype*eta_bl**1 ! &
-
-          g_bl=g_bl+(1-exp_prec(-delta_eta/delta_int))*eps_eta
-
-
-
-          x_bl=one/(4.91_mytype**2*xnu)
-
-          bxx1(j,k)=f_bl/1.0002014996204402_mytype/1.0000000359138641_mytype !To assure 1.0 in infinity
-          bxy1(j,k)=g_bl*sqrt_prec(xnu/x_bl)/1.000546554_mytype
-          bxz1(j,k)=zero
-       enddo
-    enddo
-
-    !STORE VALUE F_BL_INF G_BL_INF (ONLY ONE MORE TIME)------------------
-
-    y=yly
-    eta_bl=y*4.91_mytype/nine  !The 9 is due to interpolation
-
-    delta_eta=zero
-    eps_eta=zero
-    delta_int=zptwo
-
-    if (eta_bl>=(7.5_mytype/nine)) then
-       delta_eta=eta_bl-7.5_mytype/nine
-       eta_bl   =       7.5_mytype/nine
-       eps_eta  =   0.00015_mytype
-    end if
-
-    !To assure 1.0 in infinity
-    f_bl_inf=1678.6420959259500_mytype*eta_bl**14-11089.69250174290_mytype*eta_bl**13 &
-            +31996.435014067000_mytype*eta_bl**12-52671.52497797990_mytype*eta_bl**11 &
-            +54176.169116766700_mytype*eta_bl**10-35842.82047060970_mytype*eta_bl**9  &
-            +15201.308887124000_mytype*eta_bl**8 -4080.171379356480_mytype*eta_bl**7  &
-            +702.12963452810300_mytype*eta_bl**6 -56.20639258053180_mytype*eta_bl**5  &
-            -17.018112827391400_mytype*eta_bl**4 +0.819582894357566_mytype*eta_bl**3  &
-            -0.0601348202321954_mytype*eta_bl**2 +2.989739912704050_mytype*eta_bl**1
-
-
-    f_bl_inf=f_bl_inf+(1-exp_prec(-delta_eta/delta_int))*eps_eta
-    f_bl_inf=f_bl_inf/1.0002014996204402_mytype/1.0000000359138641_mytype !To assure 1.0 in infinity
-
-#ifdef DEBG
-    if (nrank == 0) write(*,*)'f_bl_inf ', f_bl_inf
+!********************************************************************
+!********************************************************************
+subroutine pushMUI(ux1, uy1, uz1)
+#ifdef MUI_COUPLING
+   ! Coupling varaibles 
+      use iso_c_binding
+      use mui_3d_f
+      use mui_general_f
 #endif
+      use decomp_2d_io
+      use MPI
+      use param, only : zero, zptwo, zpeight, one, nine
+      use dbg_schemes, only: exp_prec, sqrt_prec
 
-    if (eta_bl>= (7.15_mytype/nine)) then
-       delta_int=zpeight
-       delta_eta=eta_bl-7.15_mytype/nine
-       eta_bl   =       7.15_mytype/nine
-       eps_eta  =     0.0005_mytype
-    end if
+      implicit none
+      real(mytype), dimension(xsize(1), xsize(2), xsize(3)), intent(in) :: ux1, uy1, uz1
+      real(mytype) :: eta_bl, f_bl, g_bl, x_bl,h_bl
+      real(mytype) :: delta_int, delta_eta, eps_eta
 
-    g_bl_inf=4924.05284779754_mytype*eta_bl**14-34686.2970972733000_mytype*eta_bl**13 &
-            +108130.253843618_mytype*eta_bl**12-195823.099139525000_mytype*eta_bl**11 &
-            +227305.908339065_mytype*eta_bl**10-176106.001047617000_mytype*eta_bl**9  &
-            +92234.5885895112_mytype*eta_bl**8 -32700.3687158807000_mytype*eta_bl**7  &
-            +7923.51008739107_mytype*eta_bl**6 -1331.09245288739000_mytype*eta_bl**5  &
-            +130.109496961069_mytype*eta_bl**4 -7.64507811014497000_mytype*eta_bl**3  &
-            +6.94303207046209_mytype*eta_bl**2 -0.00209716712558639_mytype*eta_bl**1
+      real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z
+      integer :: i, j, k, is,iGrp
+      integer :: groupNumb  ! number of data groups to be pushed. The group is defined as a box 
+      integer, allocatable,dimension(:,:) :: groupVort,groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
+      integer, allocatable,dimension(:,:,:) :: cornLoc,corn
+      groupNumb=1
+      allocate(groupVort(groupNumb,6),groupVortLocal(groupNumb,6))
+      allocate(cornLoc(groupNumb,8,3),corn(groupNumb,8,3))
+      groupVort(1,:)=[120,120,32,50,8,12]
+      cornLoc =0
+      ! groupVort(1,:)=[120,120,5,50,3,13]
+      
+      ! corn(1,1,:)=[groupVort(1,1),groupVort(1,3),groupVort(1,5)]
+      ! corn(1,2,:)=[groupVort(1,2),groupVort(1,3),groupVort(1,5)]
+      ! corn(1,3,:)=[groupVort(1,2),groupVort(1,3),groupVort(1,6)]
+      ! corn(1,4,:)=[groupVort(1,1),groupVort(1,3),groupVort(1,6)]
 
+      ! corn(1,5,:)=[groupVort(1,1),groupVort(1,4),groupVort(1,5)]
+      ! corn(1,6,:)=[groupVort(1,2),groupVort(1,4),groupVort(1,5)]
+      ! corn(1,7,:)=[groupVort(1,2),groupVort(1,4),groupVort(1,6)]
+      ! corn(1,8,:)=[groupVort(1,1),groupVort(1,4),groupVort(1,6)]
 
-    g_bl_inf=g_bl_inf+(1-exp_prec(-delta_eta/delta_int))*eps_eta
-    g_bl_inf=g_bl_inf/1.000546554_mytype
-#ifdef DEBG
-    if (nrank == 0) write(*,*)'g_bl_inf ', g_bl_inf
-#endif
+      ! do j = 1,8
+      !    if (corn(1,j,1) >=xstart(1) .and. corn(1,j,1) <=xend(1) ) then
+      !       if (corn(1,j,2) >=xstart(2) .and. corn(1,j,2) <=xend(2) ) then
+      !          if (corn(1,j,3) >=xstart(3) .and. corn(1,j,3) <=xend(3) ) then
+      !             cornLoc(1,j,1)=corn(1,j,1)-xstart(1)+1
+      !             cornLoc(1,j,2)=corn(1,j,2)-xstart(2)+1
+      !             cornLoc(1,j,3)=corn(1,j,3)-xstart(3)+1
 
-    return
-  end subroutine blasius
+                  
+      !          endif
+      !       endif
+      !    endif
 
+      !    ! write (*,*) nrank, "/",cornLoc(1,j,:)
+      ! enddo
+      
+
+      ! stop
+
+      !!! Define the local index of points of each  group 
+      groupVortLocal = 0
+      do iGrp = 1, groupNumb
+         do j=1,3
+            i=j*2-1
+            if (groupVort(iGrp,i)>=xstart(j) .and. groupVort(iGrp,i) <=xend(j)) then
+               groupVortLocal(iGrp,i)=groupVort(iGrp,i)-xstart(j)+1
+            else if (groupVort(iGrp,i)<xstart(j) .and. groupVort(iGrp,i+1) >=xstart(j).and. groupVort(iGrp,i+1)<=xend(j)) then
+               groupVortLocal(iGrp,i) = 1
+            endif
+
+            if (groupVort(iGrp,i+1)>=xstart(j) .and. groupVort(iGrp,i+1) <=xend(j)) then
+               groupVortLocal(iGrp,i+1)=groupVort(iGrp,i+1)-xstart(j)+1
+            else if (groupVort(iGrp,i) >= xstart(j).and.groupVort(iGrp,i) <= xend(j).and.groupVort(iGrp,i+1) >=xend(j)) then
+               groupVortLocal(iGrp,i+1) = xSize(j)
+            endif
+
+         enddo
+         ! If a  group does not have a data in this local domain, set it to zero and -1. Use -1 to avoid entering the loop. 
+         if (minval(groupVortLocal(iGrp,:)) ==0)  groupVortLocal(iGrp,:) = [0, 0, 0, -1, -1, -1]  
+      enddo 
+      
+      !/ Push data to MUI interface 
+      do iGrp = 1, groupNumb
+         do k=groupVortLocal(iGrp,5),groupVortLocal(iGrp,6)
+            do j=groupVortLocal(iGrp,3),groupVortLocal(iGrp,4)
+               do i=groupVortLocal(iGrp,1),groupVortLocal(iGrp,2)
+                  point_x = real((i+xstart(1)-1-1),mytype)*dx
+                  point_y = yp(j+xstart(2)-1)
+                  point_z = real((k+xstart(3)-1-1),mytype)*dz
+                  
+                  call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "ux"//c_null_char, point_x, &
+                  point_y, point_z, ux1(i,j,k))
+
+                  call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uy"//c_null_char, point_x, &
+                  point_y, point_z, uy1(i,j,k))
+
+                  call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uz"//c_null_char, point_x, &
+                  point_y, point_z, uz1(i,j,k))
+
+               enddo
+            enddo
+         enddo
+      enddo
+
+      call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
+      ! print *, nrank,"Group Vortext local  ", groupVortLocal(iGrp,:)
+      
+      ! do k = 1, xsize(3)
+      ! do j = 1, xsize(2)
+      !    point_x = 0.0_mytype
+      !    point_y = yp(j+xstart(2)-1)
+      !    point_z = real((k+xstart(3)-1-1),mytype)*dz
+         
+      !    call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
+      !    point_z, t, spatial_sampler, temporal_sampler, bxx1(j,k))
+
+      !    call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, point_x, point_y, &
+      !    point_z, t, spatial_sampler, temporal_sampler, bxy1(j,k))
+
+      !    call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
+      !    point_z, t, spatial_sampler, temporal_sampler, bxz1(j,k))
+
+      !    end do
+      ! end do
+
+      
+end subroutine pushMUI
   !############################################################################
-  subroutine postprocess_tbl(ux1,uy1,uz1,ep1)
+  subroutine postprocess_MUIBC(ux1,uy1,uz1,ep1)
 
     USE MPI
     USE decomp_2d_io
@@ -312,9 +377,9 @@ contains
     real(mytype),intent(in),dimension(xsize(1),xsize(2),xsize(3)) :: ux1, uy1, uz1, ep1
     character(len=30) :: filename
 
-  end subroutine postprocess_tbl
+  end subroutine postprocess_MUIBC
 
-  subroutine visu_tbl_init (visu_initialised)
+  subroutine visu_MUIBC_init (visu_initialised)
 
     use decomp_2d, only : mytype
     use decomp_2d_io, only : decomp_2d_register_variable
@@ -328,15 +393,15 @@ contains
 
     visu_initialised = .true.
 
-  end subroutine visu_tbl_init
+  end subroutine visu_MUIBC_init
   !############################################################################
   !!
-  !!  SUBROUTINE: visu_tbl
+  !!  SUBROUTINE: visu_MUIBC
   !!      AUTHOR: FS
   !! DESCRIPTION: Performs TBL-specific visualization
   !!
   !############################################################################
-  subroutine visu_tbl(ux1, uy1, uz1, pp3, phi1, ep1, num)
+  subroutine visu_MUIBC(ux1, uy1, uz1, pp3, phi1, ep1, num)
 
     use var, only : ux2, uy2, uz2, ux3, uy3, uz3
     USE var, only : ta1,tb1,tc1,td1,te1,tf1,tg1,th1,ti1,di1
@@ -399,6 +464,6 @@ contains
                     + (tb1(:,:,:)-td1(:,:,:))**2)
     call write_field(di1, ".", "vort", num, flush=.true.) ! Reusing temporary array, force flush
 
-  end subroutine visu_tbl
+  end subroutine visu_MUIBC
 
-end module tbl
+end module MUIcoupledBC

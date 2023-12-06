@@ -25,7 +25,7 @@ module lockexch
   use param, only : ilmn, ibirman_eos
   use param, only : itime, ioutput, iprocessing
   use param, only : t
-
+  use variables, only :  MUI_COMM_WORLD
   implicit none
 
   real(mytype), save :: pfront
@@ -208,8 +208,8 @@ contains
           enddo
        endif
 
-       call MPI_ALLREDUCE(ek,ekg,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
-       call MPI_ALLREDUCE(ep,epg,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(ek,ekg,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
+       call MPI_ALLREDUCE(ep,epg,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
        if ((epg.ne.zero).and.(ekg.ne.zero)) then
           um = ekg / epg
@@ -229,7 +229,7 @@ contains
                 enddo
              enddo
           enddo
-          call MPI_ALLREDUCE(ek,ekg,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+          call MPI_ALLREDUCE(ek,ekg,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
           if (nrank == 0) then
              write(*,*)  "Ek / Ep: ", ekg / epg, ekg, epg
@@ -565,10 +565,10 @@ contains
     !    ilag=1
     ! endif
 
-    call MPI_REDUCE(ek,ek1,1,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
-    call MPI_REDUCE(dek,dek1,1,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
-    call MPI_REDUCE(ep,ep1,1,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
-    call MPI_REDUCE(dep,dep1,1,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(ek,ek1,1,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
+    call MPI_REDUCE(dek,dek1,1,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
+    call MPI_REDUCE(ep,ep1,1,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
+    call MPI_REDUCE(dep,dep1,1,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
 
     if (nrank .eq. 0) then
        open(67,file='./out/budget',status='unknown',form='formatted',&
@@ -654,7 +654,7 @@ contains
        mp(is)= sum(temp1)
     end do
 
-    call MPI_REDUCE(mp,mp1,numscalar,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(mp,mp1,numscalar,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
 
     return
   end subroutine suspended
@@ -680,7 +680,7 @@ contains
        end do
     enddo
 
-    call MPI_REDUCE(dms,dms1,numscalar,real_type,MPI_SUM,0,MPI_COMM_WORLD,code)
+    call MPI_REDUCE(dms,dms1,numscalar,real_type,MPI_SUM,0,MUI_COMM_WORLD,code)
 
   end subroutine depositrate
 
@@ -709,8 +709,8 @@ contains
        end do jloop
     end do kloop
 
-    call MPI_ALLREDUCE(xp(:,1),xp1,1,real2_type,MPI_MAXLOC,MPI_COMM_WORLD,code)
-    call MPI_Bcast(xp(1,:), 3,real_type, int(xp1(2)), MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(xp(:,1),xp1,1,real2_type,MPI_MAXLOC,MUI_COMM_WORLD,code)
+    call MPI_Bcast(xp(1,:), 3,real_type, int(xp1(2)), MUI_COMM_WORLD,code)
 
   end subroutine front
 
@@ -737,8 +737,8 @@ contains
        end do iloop
     end do jloop
 
-    call MPI_ALLREDUCE(xp(:,1),xp1,1,real2_type,MPI_MAXLOC,MPI_COMM_WORLD,code)
-    call MPI_Bcast(xp(1,:), 2,real_type, int(xp1(2)), MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(xp(:,1),xp1,1,real2_type,MPI_MAXLOC,MUI_COMM_WORLD,code)
+    call MPI_Bcast(xp(1,:), 2,real_type, int(xp1(2)), MUI_COMM_WORLD,code)
 
   end subroutine front2d
 

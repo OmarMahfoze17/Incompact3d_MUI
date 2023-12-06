@@ -15,6 +15,7 @@ module actuator_line_turbine
     use actuator_line_element
     use actuator_line_controller
     !use actuator_line_beam_model
+    use variables, only :  MUI_COMM_WORLD
 
     implicit none
 
@@ -640,9 +641,9 @@ contains
          !write(*,*) 'Warning: I do not own this node' 
       endif
            
-      call MPI_ALLREDUCE(Ux_part,Ux,1,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(Uy_part,Uy,1,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
-      call MPI_ALLREDUCE(Uz_part,Uz,1,real_type,MPI_SUM,MPI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Ux_part,Ux,1,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Uy_part,Uy,1,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
+      call MPI_ALLREDUCE(Uz_part,Uz,1,real_type,MPI_SUM,MUI_COMM_WORLD,ierr)
         
       Turbine%Ux_upstream=Ux
       Turbine%Uy_upstream=Uy

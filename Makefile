@@ -5,23 +5,24 @@
 #   -DDOUBLE_PREC - use double-precision
 #   -DSAVE_SINGLE - Save 3D data in single-precision
 #   -DDEBG        - debuggin xcompact3d.f90
+#   -DMUI_COUPLING  - compile with MUI library 
 # generate a Git version string
 GIT_VERSION := $(shell git describe --tag --long --always)
 
-DEFS = -DDOUBLE_PREC -DVERSION=\"$(GIT_VERSION)\"
+DEFS = -DDOUBLE_PREC -DMUI_COUPLING -DVERSION=\"$(GIT_VERSION)\"
 
 LCL = local# local,lad,sdu,archer
 IVER = 17# 15,16,17,18
 CMP = gcc# intel,gcc
 FFT = generic# generic,fftw3,mkl
-
+MUI_FORTRAN_PATH = /home/omar/WORK/codes/MUI/MUI_2.0/wrappers/Fortran
 BUILD ?=
 
 #######CMP settings###########
 ifeq ($(CMP),intel)
 FC = mpiifort
 #FFLAGS = -fpp -O3 -xHost -heap-arrays -shared-intel -mcmodel=large -safe-cray-ptr -g -traceback
-FFLAGS = -fpp -O3 -xSSE4.2 -axAVX,CORE-AVX-I,CORE-AVX2 -ipo -fp-model fast=2 -mcmodel=large -safe-cray-ptr -I$(MPI_ROOT)/lib
+FFLAGS =  -fpp -O3 -xSSE4.2 -axAVX,CORE-AVX-I,CORE-AVX2 -ipo -fp-model fast=2 -mcmodel=large -safe-cray-ptr -I$(MPI_ROOT)/lib
 ##debuggin test: -check all -check bounds -chintel eck uninit -gen-interfaces -warn interfaces
 else ifeq ($(CMP),gcc)
 FC = mpif90
@@ -53,10 +54,10 @@ TURBDIR = ./src
 ### List of files for the main code
 SRCDECOMP = $(DECOMPDIR)/decomp_2d.f90 $(DECOMPDIR)/glassman.f90 $(DECOMPDIR)/fft_$(FFT).f90 $(DECOMPDIR)/io.f90
 OBJDECOMP = $(SRCDECOMP:%.f90=%.o)
-SRC = $(SRCDIR)/module_param.f90 $(SRCDIR)/variables.f90 $(SRCDIR)/poisson.f90 $(SRCDIR)/derive.f90 $(SRCDIR)/implicit.f90 $(SRCDIR)/schemes.f90 $(SRCDIR)/parameters.f90 $(SRCDIR)/*.f90
+SRC = $(SRCDIR)/module_param.f90 $(SRCDIR)/variables.f90 $(SRCDIR)/poisson.f90 $(SRCDIR)/derive.f90 $(SRCDIR)/implicit.f90 $(SRCDIR)/schemes.f90 $(SRCDIR)/parameters.f90  $(SRCDIR)/*.f90
 OBJ = $(SRC:%.f90=%.o)
-SRC = $(SRCDIR)/module_param.f90 $(SRCDIR)/variables.f90 $(SRCDIR)/BC-dbg-schemes.f90 $(SRCDIR)/poisson.f90 $(SRCDIR)/ibm.f90 $(SRCDIR)/derive.f90 $(SRCDIR)/implicit.f90 $(SRCDIR)/schemes.f90 $(SRCDIR)/forces.f90 $(SRCDIR)/probes.f90 $(SRCDIR)/navier.f90 $(SRCDIR)/tools.f90 $(SRCDIR)/visu.f90 $(SRCDIR)/BC-TBL.f90 $(SRCDIR)/BC-ABL.f90 $(SRCDIR)/les_models.f90 $(SRCDIR)/BC-Lock-exchange.f90 $(SRCDIR)/time_integrators.f90 $(SRCDIR)/filters.f90 $(SRCDIR)/parameters.f90 $(SRCDIR)/BC-User.f90 $(SRCDIR)/BC-TGV.f90 $(SRCDIR)/BC-Channel-flow.f90 $(SRCDIR)/BC-Periodic-hill.f90 $(SRCDIR)/BC-Cylinder.f90 $(SRCDIR)/BC-Mixing-layer.f90 $(SRCDIR)/BC-Sandbox.f90 $(SRCDIR)/BC-Uniform.f90 $(SRCDIR)/BC-Cavity.f90 $(SRCDIR)/BC-Pipe-flow.f90 $(TURBDIR)/constants.f90 $(TURBDIR)/acl_utils.f90 $(TURBDIR)/airfoils.f90 $(TURBDIR)/dynstall.f90 $(TURBDIR)/dynstall_legacy.f90 $(TURBDIR)/acl_elem.f90 $(TURBDIR)/acl_controller.f90 $(TURBDIR)/acl_turb.f90 $(TURBDIR)/acl_out.f90 $(TURBDIR)/acl_farm_controller.f90 $(TURBDIR)/acl_model.f90 $(TURBDIR)/acl_source.f90 $(TURBDIR)/adm.f90 $(TURBDIR)/turbine.f90 $(SRCDIR)/statistics.f90 $(SRCDIR)/case.f90 $(SRCDIR)/transeq.f90 $(SRCDIR)/genepsi3d.f90 $(SRCDIR)/xcompact3d.f90
-
+SRC = $(SRCDIR)/mui_f_wrapper_3d.f90 $(SRCDIR)/module_param.f90 $(SRCDIR)/variables.f90 $(SRCDIR)/BC-dbg-schemes.f90  $(SRCDIR)/poisson.f90 $(SRCDIR)/ibm.f90 $(SRCDIR)/derive.f90 $(SRCDIR)/implicit.f90 $(SRCDIR)/schemes.f90 $(SRCDIR)/forces.f90 $(SRCDIR)/probes.f90 $(SRCDIR)/navier.f90 $(SRCDIR)/tools.f90 $(SRCDIR)/visu.f90 $(SRCDIR)/BC-TBL.f90 $(SRCDIR)/BC-MUICoupling.f90 $(SRCDIR)/BC-ABL.f90 $(SRCDIR)/les_models.f90 $(SRCDIR)/BC-Lock-exchange.f90 $(SRCDIR)/time_integrators.f90 $(SRCDIR)/filters.f90 $(SRCDIR)/parameters.f90 $(SRCDIR)/BC-User.f90 $(SRCDIR)/BC-TGV.f90 $(SRCDIR)/BC-Channel-flow.f90 $(SRCDIR)/BC-Periodic-hill.f90 $(SRCDIR)/BC-Cylinder.f90 $(SRCDIR)/BC-Mixing-layer.f90 $(SRCDIR)/BC-Sandbox.f90 $(SRCDIR)/BC-Uniform.f90 $(SRCDIR)/BC-Cavity.f90 $(SRCDIR)/BC-Pipe-flow.f90  $(TURBDIR)/constants.f90 $(TURBDIR)/acl_utils.f90 $(TURBDIR)/airfoils.f90 $(TURBDIR)/dynstall.f90 $(TURBDIR)/dynstall_legacy.f90 $(TURBDIR)/acl_elem.f90 $(TURBDIR)/acl_controller.f90 $(TURBDIR)/acl_turb.f90 $(TURBDIR)/acl_out.f90 $(TURBDIR)/acl_farm_controller.f90 $(TURBDIR)/acl_model.f90 $(TURBDIR)/acl_source.f90 $(TURBDIR)/adm.f90 $(TURBDIR)/turbine.f90 $(SRCDIR)/statistics.f90 $(SRCDIR)/case.f90 $(SRCDIR)/transeq.f90 $(SRCDIR)/genepsi3d.f90 $(SRCDIR)/xcompact3d.f90
+# SRC = $(SRC) $(MUI_FORTRAN_PATH)/mui_f_wrapper_3d.f90
 
 #######FFT settings##########
 ifeq ($(FFT),fftw3)
@@ -84,9 +85,10 @@ else ifeq ($(FFT),ffte)
 endif
 
 #######OPTIONS settings###########
-OPT := -I$(SRCDIR) -I$(DECOMPDIR) $(FFLAGS)
+OPT := -I$(SRCDIR) -I$(DECOMPDIR)  $(FFLAGS)
 LINKOPT := $(FFLAGS)
 
+MUI_CPL := -I$(MUI_FORTRAN_PATH) -L$(MUI_FORTRAN_PATH) -lMUI_Fortran_wrapper -lstdc++ -lmpi_cxx -Wl,-rpath,$(MUI_FORTRAN_PATH)
 LIBIO :=
 ADIOS2DIR :=
 ifeq ($(IO),adios2)
@@ -104,22 +106,22 @@ endif
 all: xcompact3d
 
 xcompact3d : $(OBJDECOMP) $(OBJ)
-	$(FC) -o $@ $(LINKOPT) $(OBJDECOMP) $(OBJ) $(LIBFFT) $(LIBIO)
+	$(FC) -o $@ $(LINKOPT)  $(OBJDECOMP) $(OBJ) $(LIBFFT) $(LIBIO) $(MUI_CPL)
 
 $(OBJDECOMP):$(DECOMPDIR)%.o : $(DECOMPDIR)%.f90
-	$(FC) $(FFLAGS) $(OPT) $(DEFS) $(DEFS2) $(INC) -c $<
+	$(FC) $(FFLAGS) $(OPT) $(DEFS) $(DEFS2) $(INC) $(MUI_CPL) -c $<
 	mv $(@F) ${DECOMPDIR}
 	#mv *.mod ${DECOMPDIR}
 
 
 $(OBJ):$(SRCDIR)%.o : $(SRCDIR)%.f90
-	$(FC) $(FFLAGS) $(OPT) $(DEFS) $(DEFS2) $(INC) -c $<
+	$(FC) $(FFLAGS) $(OPT) $(MUI_CPL) $(DEFS) $(DEFS2) $(INC) $(MUI_CPL) -c $<
 	mv $(@F) ${SRCDIR}
 	#mv *.mod ${SRCDIR}
 
 ## This %.o : %.f90 doesn't appear to be called...
-%.o : %.f90
-	$(FC) $(FFLAGS) $(DEFS) $(DEFS2) $(INC) -c $<
+# %.o : %.f90
+# 	$(FC) $(FFLAGS) $(DEFS) $(DEFS2) $(INC) $(MUI_CPL) -c $<
 
 .PHONY: clean
 

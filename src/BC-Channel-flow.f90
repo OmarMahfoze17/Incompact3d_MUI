@@ -158,7 +158,7 @@ contains
 
     real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ux,uy,uz
     real(mytype),dimension(xsize(1),xsize(2),xsize(3),numscalar) :: phi
-
+    
     if (.not. cpg ) then ! if not constant pressure gradient
        if (idir_stream == 1) then
           call channel_cfr(ux,two/three)
@@ -166,7 +166,6 @@ contains
           call channel_cfr(uz,two/three)
        endif
     end if
-
     if (iscalar /= 0) then
        if (iimplicit <= 0) then
           if ((nclyS1 == 2).and.(xstart(2) == 1)) then
@@ -224,7 +223,7 @@ contains
 
     ub = ub * coeff
 
-    call MPI_ALLREDUCE(ub,uball,1,real_type,MPI_SUM,MPI_COMM_WORLD,code)
+    call MPI_ALLREDUCE(ub,uball,1,real_type,MPI_SUM,MUI_COMM_WORLD,code)
 
     can = - (constant - uball)
 
