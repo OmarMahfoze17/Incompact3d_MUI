@@ -77,7 +77,8 @@ subroutine parameter(input_i3d)
   NAMELIST /CASE/ pfront
   NAMELIST/ALMParam/iturboutput,NTurbines,TurbinesPath,NActuatorlines,ActuatorlinesPath,eps_factor,rho_air
   NAMELIST/ADMParam/Ndiscs,ADMcoords,iturboutput,rho_air,T_relax
-  NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection,interfacelocation,MUIBC_ID
+  NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection, &
+   interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,tolerance,sendReceiveMode
 
 
 

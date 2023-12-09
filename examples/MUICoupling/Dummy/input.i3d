@@ -43,7 +43,7 @@ u2  = 1.              ! u2 (min velocity) (for inflow condition)
 init_noise = 0.0      ! Turbulence intensity (1=100%) !! Initial condition
 inflow_noise = 0.0    ! Turbulence intensity (1=100%) !! Inflow condition
 
-nclx1 = 2
+nclx1 = 3
 nclxn = 2
 ncly1 = 2
 nclyn = 2
@@ -149,11 +149,10 @@ interfaceLocation  = 1, 120   ! This is an array to define the location of all i
 MUIBC_ID = 1, 1, 1, 1, 1, 1   ! Associate an interface indentfied by MUIBC_ID to the boundary condition. 
                               !i.e. MUIBC_ID(1) coresponds to the BC of x=0, MUIBC_ID(2) => BC at x=xlx, MUIBC_ID(3) => BC at y=0 , MUIBC_ID(4) =>  BC at y=yly
                               !MUIBC_ID(5) => BC at z=0, MUIBC_ID(2) => BC at z=zlz
-groupNumb = 1
-groupVort(1,:) = 120, 120, 1, 129, 1, 32  ! Define box corners for group of points to be pushed
+groupNumb = 0
+groupVort(1,:) = 129, 129, 129, 129, 1, 1  ! Define box corners for group of points to be pushed
 dataOrgShft = 0, 0 ,0
 tolerance = 10e-37            ! tolerance needed when comparing equal values. Needed when exact spatial and temporal samplers are used. Default is 10e-37
-
 /End
 &CASE
 /End

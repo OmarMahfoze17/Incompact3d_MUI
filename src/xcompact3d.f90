@@ -39,7 +39,17 @@ program xcompact3d
      
      do itr=1,iadvance_time
         call set_fluid_properties(rho1,mu1)
-        call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+        if (sendReceiveMode==1) then
+            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+            call pushMUI(ux1, uy1, uz1)
+        else if (sendReceiveMode==2) then
+            call pushMUI(ux1, uy1, uz1)
+            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+            
+        else 
+            write(*,*) "Wrong selction of sendReceiveMode to ", sendReceiveMode
+        endif
+
         if (imove.eq.1) then ! update epsi for moving objects
           if ((iibm.eq.2).or.(iibm.eq.3)) then
              call genepsi3d(ep1)
@@ -72,7 +82,7 @@ program xcompact3d
         !!!!     ADD the data send call !!!!!!!!!!!!!!!!!!!!!!!!
         !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      enddo !! End sub timesteps
-     call pushMUI(ux1, uy1, uz1)
+     
      call restart(ux1,uy1,uz1,dux1,duy1,duz1,ep1,pp3(:,:,:,1),phi1,dphi1,px1,py1,pz1,rho1,drho1,mu1,1)
 
      call simu_stats(3) ! screen/log output
@@ -294,7 +304,11 @@ subroutine finalise_xcompact3d()
   use probes, only : finalize_probes
   use visu, only : visu_finalise
   use les, only: finalise_explicit_les
-
+#ifdef MUI_COUPLING
+   use iso_c_binding
+   use mui_3d_f
+   use mui_general_f
+#endif
   implicit none
 
   integer :: ierr
@@ -309,7 +323,9 @@ subroutine finalise_xcompact3d()
         close(38)
      endif
   endif
-  
+#ifdef MUI_COUPLING
+  deallocate(uniface_pointers_3d)
+#endif
   call simu_stats(4)
   call finalize_probes()
   call visu_finalise()

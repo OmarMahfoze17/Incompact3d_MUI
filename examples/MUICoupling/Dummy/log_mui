@@ -1,0 +1,688 @@
+  xxxx            2           4           3
+  xxxx            3           4           3
+  xxxx            0           4           3
+ Xcompact3d is run with the default file -->input.i3d
+ ===========================================================
+ ======================Xcompact3D===========================
+ ===Copyright (c) 2018 Eric Lamballais and Sylvain Laizet===
+ ===Modified by Felipe Schuch and Ricardo Frantz============
+ ===Modified by Paul Bartholomew, Georgios Deskos and=======
+ ===Sylvain Laizet -- 2018- ================================
+ ===========================================================
+ Git version        : v4.0-249-g8d7b078
+  xxxx            1           4           3
+MUI [lib_mpi_multidomain]: Rank: 4, "dummySendReceive–∏¨®U" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 4, "dummySendReceive–∏¨®U" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 3, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 3, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 0, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 0, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 2, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 2, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI [lib_mpi_multidomain]: Rank: 1, "xcompact3d" registered interface "interface_1" as a1c24ebc
+MUI [lib_mpi_multidomain]: Rank: 1, "xcompact3d" registered interface "interface_2" as 6abfb875
+MUI Info [lib_mpi_multidomain]: 2 distinct interface(s) found
+MUI [lib_mpi_multidomain]: Setting up interface interface_1 [a1c24ebc] (rank ids are local to each interface)
+MUI [comm_mpi.h]: Rank: 0, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 4, Identifier: mpi://dummySendReceive–∏¨®U/interface_1, Domain size: 1, Peers: 4
+MUI [comm_mpi.h]: Rank: 3, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 1, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 2, Identifier: mpi://xcompact3d/interface_1, Domain size: 4, Peers: 1
+MUI [lib_mpi_multidomain]: Setting up interface interface_2 [6abfb875] (rank ids are local to each interface)
+MUI [comm_mpi.h]: Rank: 1, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 0, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 2, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+MUI [comm_mpi.h]: Rank: 4, Identifier: mpi://dummySendReceive–∏¨®U/interface_2, Domain size: 1, Peers: 4
+MUI [comm_mpi.h]: Rank: 3, Identifier: mpi://xcompact3d/interface_2, Domain size: 4, Peers: 1
+ Warning : support for implicit Y diffusion and isecondder=5 is experimental
+ ===========================================================
+ MUI coupled boundary condition
+ ===========================================================
+ Reynolds number Re     :          1250.000
+ xnu                    :        0.00080000
+ ===========================================================
+ p_row, p_col           :         0       0
+ ===========================================================
+ Time step dt           :        0.01000000
+ Temporal scheme        :    Adams-bashforth 3
+                                           With CN for Y diffusion
+                    : DNS
+ ===========================================================
+ ifirst                 :                 1
+ ilast                  :                25
+ ===========================================================
+ Lx                     :       50.00000000
+ Ly                     :       20.00000000
+ Lz                     :        5.00000000
+ nx                     :               129
+ ny                     :               129
+ nz                     :                32
+ ===========================================================
+ istret                 :                 3
+ beta                   :        0.70000000
+ ===========================================================
+ nu0nu                  :        4.00000000
+ cnu                    :        0.33000000
+ ===========================================================
+ Scalar                 :                on
+ numscalar              :                 1
+ Schmidt number sc( 1)  :        1.00000000
+ Richardson n.  ri( 1)  :        0.00000000
+ ===========================================================
+ spinup_time            :                 0
+ wrotation              :        0.12000000
+ ===========================================================
+ Immersed boundary      :               off
+ ===========================================================
+ Boundary condition velocity field: 
+ nclx1, nclxn           :               2,2
+ ncly1, nclyn           :               2,2
+ nclz1, nclzn           :               0,0
+ ===========================================================
+ Boundary condition scalar field: 
+ nclxS1, nclxSn         :               2,2
+ nclyS1, nclySn         :               2,2
+ nclzS1, nclzSn         :               0,0
+ ===========================================================
+ Numerical precision: Double
+ ===========================================================
+ High and low speed : u1=  1.00 and u2=  1.00
+ Gravity vector     : (gx, gy, gz)=(     0.00000000,     0.00000000,     0.00000000)
+  
+ ===========================================================
+ In auto-tuning mode......
+ factors:            1           2           4
+ p_row x p_col           2           2
+ # Initializing variables...
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+ Using the hyperviscous operator with (nu_0/nu,c_nu) = (   4.0000000000000000      ,  0.33000000000000002      )
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  
+ ++++++++++++++++++++++++++++++++
+ LES Modelling
+ ++++++++++++++++++++++++++++++++
+ ++++++++++++++++++++++++++++++++
+  
+ Initialising IO for turb-io
+ ===========================================================
+ Visu module requires    0.00000000     GB
+ ===========================================================
+ Initialising IO for solution-io
+ ===========================================================
+ Diffusion number
+ cfl_diff_x             :           0.00005243
+ cfl_diff_y             :           0.02775153
+ cfl_diff_z             :           0.00032768
+ cfl_diff_sum           :           0.02813164
+ ===========================================================
+ U,V,W min=   0.00000000       0.00000000       0.00000000    
+ U,V,W max=  0.999946296       3.37742991E-03   0.00000000    
+ Phi1 min max=  0.250000000       1.00000000    
+ ===========================================================
+ Time step =      1/     25, Time unit =   0.0100
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.648181
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16887   -0.00844
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.479310
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00844
+ DIV U* max mean=  0.15033325202519135        1.4215739155108882E-003
+  
+ ***** Using the generic FFT engine *****
+  
+ DIV U  max mean=   4.4845306071872228E-008   1.2078680253772464E-004
+ U,V,W min=  -3.13744415E-03  -6.47642314E-02  -7.76168017E-04
+ U,V,W max=   1.10035932       7.06150532E-02   8.94663855E-04
+ CFL_x                  :        0.02816920
+ CFL_y                  :        0.00051748
+ CFL_z                  :        0.00005726
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.356191516    
+ ===========================================================
+ Time step =      2/     25, Time unit =   0.0200
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.648229
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.16887   -0.00845
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.479310
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00844
+ DIV U* max mean=  0.34256739863097641        3.3044089433086434E-004
+ DIV U  max mean=   6.5685090579702815E-005   2.0553782185607657E-004
+ U,V,W min=  -6.10886794E-03 -0.130880520      -1.61840022E-03
+ U,V,W max=   1.19255924      0.145568162       1.86713377E-03
+ CFL_x                  :        0.03052952
+ CFL_y                  :        0.00226013
+ CFL_z                  :        0.00011950
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.454547912    
+ Time for this time step (s):  0.130454004    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      3/     25, Time unit =   0.0300
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.648793
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.15667   -0.00786
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.491508
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00783
+ DIV U* max mean=  0.50791826417287778        4.3793101976460355E-004
+ DIV U  max mean=   7.9817059511137593E-008   3.9475295125513277E-004
+ U,V,W min=  -6.58734841E-03 -0.244351044      -2.38897651E-03
+ U,V,W max=   1.28595245      0.257165849       2.75142840E-03
+ CFL_x                  :        0.03292038
+ CFL_y                  :        0.00195941
+ CFL_z                  :        0.00017609
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.545798659    
+ Time for this time step (s):  0.130174994    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      4/     25, Time unit =   0.0400
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.648615
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.14311   -0.00718
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.505070
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00716
+ DIV U* max mean=  0.60235697357629170        5.7621522530572279E-004
+ DIV U  max mean=   7.8248474894015985E-008   5.2347841661746618E-004
+ U,V,W min=  -2.59049125E-02 -0.433194965      -3.11099249E-03
+ U,V,W max=   1.37911201      0.453876346       3.58232227E-03
+ CFL_x                  :        0.03530527
+ CFL_y                  :        0.00320864
+ CFL_z                  :        0.00022927
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.630660534    
+ Time for this time step (s):  0.129999995    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      5/     25, Time unit =   0.0500
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.647594
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.12251   -0.00610
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.525673
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00613
+ DIV U* max mean=  0.64180846021312143        7.3079867264985038E-004
+ DIV U  max mean=   7.2401191101873624E-008   6.3585795089173675E-004
+ U,V,W min=  -5.63967712E-02 -0.649340451      -3.81021271E-03
+ U,V,W max=   1.47195780      0.672572255       4.38602595E-03
+ CFL_x                  :        0.03768212
+ CFL_y                  :        0.00475469
+ CFL_z                  :        0.00028071
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.709722996    
+ Time for this time step (s):  0.133612007    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      6/     25, Time unit =   0.0600
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.646182
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.10308   -0.00505
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.545103
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00515
+ DIV U* max mean=  0.64795367424674166        8.9254507058384325E-004
+ DIV U  max mean=   6.7147525880696668E-008   7.4665694346709574E-004
+ U,V,W min=  -9.31662843E-02 -0.882398844      -4.48665163E-03
+ U,V,W max=   1.56429183      0.899269283       5.16240159E-03
+ CFL_x                  :        0.04004587
+ CFL_y                  :        0.00635731
+ CFL_z                  :        0.00033039
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.783523560    
+ Time for this time step (s):  0.131975994    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      7/     25, Time unit =   0.0700
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.644722
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08996   -0.00433
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.558219
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00450
+ DIV U* max mean=  0.63462530516249638        1.0720064637873910E-003
+ DIV U  max mean=   6.4178684835297650E-008   8.5617900851477048E-004
+ U,V,W min= -0.135974050      -1.12874711      -5.14019653E-03
+ U,V,W max=   1.65584350       1.12936246       5.91142988E-03
+ CFL_x                  :        0.04238959
+ CFL_y                  :        0.00798393
+ CFL_z                  :        0.00037833
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.852542162    
+ Time for this time step (s):  0.130505994    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      8/     25, Time unit =   0.0800
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.643360
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08358   -0.00394
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.564601
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00418
+ DIV U* max mean=  0.60919387448440776        1.2589330442763262E-003
+ DIV U  max mean=   6.3178432111767047E-008   9.6285589416974799E-004
+ U,V,W min= -0.184572726      -1.38952982      -5.77183440E-03
+ U,V,W max=   1.74637449       1.36411381       6.63416274E-03
+ CFL_x                  :        0.04470719
+ CFL_y                  :        0.00982316
+ CFL_z                  :        0.00042459
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.917207003    
+ Time for this time step (s):  0.129401997    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =      9/     25, Time unit =   0.0900
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.642108
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08170   -0.00378
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.566478
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00409
+ DIV U* max mean=  0.57634196720398867        1.4426000462616452E-003
+ DIV U  max mean=   6.3381245825073346E-008   1.0660222642038808E-003
+ U,V,W min= -0.238712892      -1.66793227      -6.38808822E-03
+ U,V,W max=   1.83567119       1.60680795       7.33165629E-03
+ CFL_x                  :        0.04699318
+ CFL_y                  :        0.01179130
+ CFL_z                  :        0.00046923
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000      0.977901578    
+ Time for this time step (s):  0.130623996    
+ Remaining time:       0 h  0 min
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     10/     25, Time unit =   0.1000
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.640907
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08179   -0.00373
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.566396
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00409
+ DIV U* max mean=  0.53981772655768290        1.6213133950252832E-003
+ DIV U  max mean=   6.3506553705464791E-008   1.1657111797050666E-003
+ U,V,W min= -0.298146009      -1.96706617      -6.98990049E-03
+ U,V,W max=   1.92354572       1.86014676       8.00480414E-03
+ CFL_x                  :        0.04924277
+ CFL_y                  :        0.01390600
+ CFL_z                  :        0.00051231
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.03496993    
+ Time for this time step (s):  0.143721998    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     11/     25, Time unit =   0.1100
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.639677
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08218   -0.00368
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.565997
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00411
+ DIV U* max mean=  0.50258597120968351        1.7987114407148328E-003
+ DIV U  max mean=   6.3340670540187882E-008   1.2621629128376074E-003
+ U,V,W min= -0.362626672      -2.28894782      -7.57533871E-03
+ U,V,W max=   2.00986934       2.12511754       8.65438394E-03
+ CFL_x                  :        0.05145265
+ CFL_y                  :        0.01618152
+ CFL_z                  :        0.00055388
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.08872116    
+ Time for this time step (s):  0.146507993    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     12/     25, Time unit =   0.1200
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.638353
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08231   -0.00362
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.565869
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00412
+ DIV U* max mean=  0.46664055383564013        1.9844959401543296E-003
+ DIV U  max mean=   6.3005541105567997E-008   1.3555975514739176E-003
+ U,V,W min= -0.431914926      -2.63443923      -8.14526808E-03
+ U,V,W max=   2.09449267       2.40098166       9.28108208E-03
+ CFL_x                  :        0.05361901
+ CFL_y                  :        0.01862394
+ CFL_z                  :        0.00059399
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.13943326    
+ Time for this time step (s):  0.145647004    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     13/     25, Time unit =   0.1300
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.636894
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08229   -0.00355
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.565895
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00411
+ DIV U* max mean=  0.43304061712543646        2.1679140909629346E-003
+ DIV U  max mean=   6.2717066062235871E-008   1.4461714852617711E-003
+ U,V,W min= -0.505777836      -3.00373507      -8.70047137E-03
+ U,V,W max=   2.17730141       2.68586016       9.88550484E-03
+ CFL_x                  :        0.05573891
+ CFL_y                  :        0.02123464
+ CFL_z                  :        0.00063267
+ Phi1 min max=   0.00000000       1.18735671    
+ Time for this time step (s):  0.134045005    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     14/     25, Time unit =   0.1400
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.635285
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08251   -0.00348
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.565673
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00413
+ DIV U* max mean=  0.40214171878927329        2.3521863480155478E-003
+ DIV U  max mean=   6.2592208046816089E-008   1.5339935897543120E-003
+ U,V,W min= -0.586306632      -3.39696598      -9.24165547E-03
+ U,V,W max=   2.25820065       2.97743797       1.04681868E-02
+ CFL_x                  :        0.05780994
+ CFL_y                  :        0.02401456
+ CFL_z                  :        0.00066996
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.23271787    
+ Time for this time step (s):  0.132636994    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     15/     25, Time unit =   0.1500
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.633524
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08337   -0.00344
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.564808
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00417
+ DIV U* max mean=  0.37385213921537241        2.5379652165769574E-003
+ DIV U  max mean=   6.2649276697836209E-008   1.6191427837381094E-003
+ U,V,W min= -0.679309964      -3.81464505      -9.76945926E-03
+ U,V,W max=   2.33718610       3.27349234       1.10734189E-02
+ CFL_x                  :        0.05983196
+ CFL_y                  :        0.02696730
+ CFL_z                  :        0.00070870
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.27572083    
+ Time for this time step (s):  0.131490007    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     16/     25, Time unit =   0.1600
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.631615
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08512   -0.00343
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.563059
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00426
+ DIV U* max mean=  0.34782659852389264        2.7287710571471278E-003
+ DIV U  max mean=   6.2819689272946427E-008   1.7016754351642199E-003
+ U,V,W min= -0.777889490      -4.25786257      -1.02966959E-02
+ U,V,W max=   2.41416478       3.57213402       1.17606986E-02
+ CFL_x                  :        0.06180262
+ CFL_y                  :        0.03010059
+ CFL_z                  :        0.00075268
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.31655061    
+ Time for this time step (s):  0.129989997    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     17/     25, Time unit =   0.1700
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.629563
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.08783   -0.00346
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.560346
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00439
+ DIV U* max mean=  0.36887929636214095        2.9271122780024335E-003
+ DIV U  max mean=   6.3059062337285365E-008   1.7816273662065868E-003
+ U,V,W min= -0.881883442      -4.72827196      -1.09238215E-02
+ U,V,W max=   2.48907542       3.87180591       1.24360602E-02
+ CFL_x                  :        0.06372033
+ CFL_y                  :        0.03342611
+ CFL_z                  :        0.00079591
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.35537469    
+ Time for this time step (s):  0.129434004    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     18/     25, Time unit =   0.1800
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.627369
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.09148   -0.00353
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.556705
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00457
+ DIV U* max mean=  0.39971161293828883        3.1261565209463578E-003
+ DIV U  max mean=   6.3303059668739364E-008   1.8590158322764126E-003
+ U,V,W min=  -1.06258178      -5.22797537      -1.15459338E-02
+ U,V,W max=   2.56204343       4.17115116       1.30988630E-02
+ CFL_x                  :        0.06558831
+ CFL_y                  :        0.03695872
+ CFL_z                  :        0.00083833
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.39234507    
+ Time for this time step (s):  0.130438000    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     19/     25, Time unit =   0.1900
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.625029
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.09597   -0.00364
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.552209
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00480
+ DIV U* max mean=  0.42934685784943621        3.3307757689376508E-003
+ DIV U  max mean=   6.3559475277537303E-008   1.9338432305254748E-003
+ U,V,W min=  -1.26657104      -5.75939226      -1.21627674E-02
+ U,V,W max=   2.63298106       4.46885872       1.37485052E-02
+ CFL_x                  :        0.06740432
+ CFL_y                  :        0.04071552
+ CFL_z                  :        0.00087990
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.42759967    
+ Time for this time step (s):  0.131531999    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     20/     25, Time unit =   0.2000
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.622538
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.10126   -0.00378
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.546924
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00506
+ DIV U* max mean=  0.45785032841205986        3.5434712003239166E-003
+ DIV U  max mean=   6.3825894560005925E-008   2.0061017533066607E-003
+ U,V,W min=  -1.48428345      -6.32518291      -1.27740810E-02
+ U,V,W max=   2.70181870       4.76355267       1.43844215E-02
+ CFL_x                  :        0.06916656
+ CFL_y                  :        0.04471533
+ CFL_z                  :        0.00092060
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.46126401    
+ Time for this time step (s):  0.131080002    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     21/     25, Time unit =   0.2100
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.619888
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.10731   -0.00395
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.540872
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00537
+ DIV U* max mean=  0.48531382249603250        3.7577243682382312E-003
+ DIV U  max mean=   6.4144861501407024E-008   2.0757775377826448E-003
+ U,V,W min=  -1.71552229      -6.92823553      -1.33796548E-02
+ U,V,W max=   2.76884222       5.05375481       1.50060812E-02
+ CFL_x                  :        0.07088236
+ CFL_y                  :        0.04897856
+ CFL_z                  :        0.00096039
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.49345255    
+ Time for this time step (s):  0.132318005    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     22/     25, Time unit =   0.2200
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.617071
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.11414   -0.00415
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.534040
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00571
+ DIV U* max mean=  0.51180067554952757        3.9813869975933508E-003
+ DIV U  max mean=   6.4506149687407199E-008   2.1428534259026696E-003
+ U,V,W min=  -1.95846486      -7.57170010      -1.39792832E-02
+ U,V,W max=   2.83421421       5.33790016       1.56129822E-02
+ CFL_x                  :        0.07255589
+ CFL_y                  :        0.05352748
+ CFL_z                  :        0.00099923
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.52426922    
+ Time for this time step (s):  0.130613998    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     23/     25, Time unit =   0.2300
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.614076
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.12180   -0.00438
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.526386
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00609
+ DIV U* max mean=  0.53732197595975295        4.2171414451939292E-003
+ DIV U  max mean=   6.4940656614373427E-008   2.2073101882885389E-003
+ U,V,W min=  -2.21124148      -8.25905418      -1.45727769E-02
+ U,V,W max=   2.89756751       5.61437511       1.62046477E-02
+ CFL_x                  :        0.07417773
+ CFL_y                  :        0.05838667
+ CFL_z                  :        0.00103710
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.55380929    
+ Time for this time step (s):  0.131899998    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     24/     25, Time unit =   0.2400
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.610893
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.13032   -0.00465
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.517861
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00652
+ DIV U* max mean=  0.56184057418810951        4.4660463882937569E-003
+ DIV U  max mean=   6.5467888618088443E-008   2.2691266841461141E-003
+ U,V,W min=  -2.47317171      -8.99416542      -1.51599590E-02
+ U,V,W max=   2.95947671       5.88156748       1.67806260E-02
+ CFL_x                  :        0.07576260
+ CFL_y                  :        0.06358348
+ CFL_z                  :        0.00107396
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Phi1 min max=   0.00000000       1.58215964    
+ Time for this time step (s):  0.130524993    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+ Time step =     25/     25, Time unit =   0.2500
+  boundary_conditions_MUIBC boundary_conditions_MUIBC boundary_conditions_MUIBCboundary_conditions_MUIBC
+ Mass balance: L-BC, R-BC,   19.648181   19.607513
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.13976   -0.00495
+ TRIPPING!!
+ Mass balance: L-BC, R-BC,   19.648181   19.508417
+ Mass balance: B-BC, T-BC, Crr-Vel    0.00000    0.00000    0.00699
+ DIV U* max mean=  0.58529074490326760        4.7250243017268930E-003
+ DIV U  max mean=   6.6053719134130662E-008   2.3282794476749621E-003
+ U,V,W min=  -2.74396443      -9.78134632      -1.57406628E-02
+ U,V,W max=   3.02004766       6.13789749       1.73404869E-02
+ CFL_x                  :        0.07731322
+ CFL_y                  :        0.06914838
+ CFL_z                  :        0.00110979
+ Phi1 min max=   0.00000000       1.60939956    
+ Time for this time step (s):  0.130860001    
+ Remaining time:       0 h  0 min
+ Elapsed time:         0 h  0 min
+ ===========================================================
+                                                            
+ Good job! Xcompact3d finished successfully!                
+                                                            
+ 2DECOMP with p_row*p_col=           0           0
+                                                            
+ nx*ny*nz=      532512
+ nx,ny,nz=         129         129          32
+ dx,dy,dz=  0.39062500000000000       0.15625000000000000       0.15625000000000000     
+                                                            
+ Averaged time per step (s):  0.133002356    
+ Total wallclock (s):   3.32505894    
+ Total wallclock (m):   5.54176494E-02
+ Total wallclock (h):   9.23627522E-04
+                                                            

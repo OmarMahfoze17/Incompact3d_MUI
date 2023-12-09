@@ -57,6 +57,12 @@ module variables
   character(:), allocatable :: domain3d
   integer :: interfaceDirection(200), interfaceLocation(200)
   integer,allocatable,dimension(:) :: ifsDir,ifsLoc
+  integer :: groupNumb  ! number of data groups to be pushed. The group is defined as a box 
+  integer :: groupVort(200,6)
+  !The domain is alwyes start at (0,0,0), but there are cases where 
+  !data is needed to be pushed/fitched to/from domain that is shifted from 0  
+  real(mytype) :: dataOrgShft(3) = 0
+
   type(c_ptr), target :: uniface_3d=c_null_ptr
   type(c_ptr), target :: spatial_sampler=c_null_ptr
   type(c_ptr), target :: temporal_sampler=c_null_ptr
@@ -64,7 +70,7 @@ module variables
   ! integer(c_int) :: MUI_COMM_WORLD
   integer(c_int) :: MUI_COMM_WORLD
   integer :: MUI_x1_ID,MUI_xn_ID,MUI_y1_ID,MUI_yn_ID,MUI_z1_ID,MUI_zn_ID   
-  integer :: MUIBC_ID(6)
+  integer :: MUIBC_ID(6),sendReceiveMode
 
   
 #endif

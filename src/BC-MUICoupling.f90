@@ -101,9 +101,10 @@ contains
     real(mytype) :: udx,udy,udz,uddx,uddy,uddz,cx
 
     integer :: i, j, k, is
-
+      
     !INFLOW with an update of bxx1, byy1 and bzz1 at the inlet
     if (nclx1==2) then ! Use the orignial TBL inlet conditions 
+      
       call blasius()
     elseif (nclx1==3) then ! Use the orignial get inlet conditions from MUI interface 
       call recieveMUIBC()
@@ -210,15 +211,19 @@ contains
     real(mytype) :: eta_bl, f_bl, g_bl, x_bl,h_bl
     real(mytype) :: delta_int, delta_eta, eps_eta
 
-    real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z
+    real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
     integer :: i, j, k, is
+    grdSpce(1) = xlx/(nx-1)
+    grdSpce(2) = yly/(ny-1)
+    grdSpce(3) = zlz/(nz-1)
+
 
     print *, "Fetched 3D interface values at time  ",t
     do k = 1, xsize(3)
       do j = 1, xsize(2)
-         point_x = 0.0_mytype
-         point_y = yp(j+xstart(2)-1)
-         point_z = real((k+xstart(3)-1-1),mytype)*dz
+         point_x = 0.0_mytype + dataOrgShft(1)
+         point_y = yp(j+xstart(2)-1) + dataOrgShft(2)
+         point_z = real((k+xstart(3)-1),mytype)*grdSpce(3) + dataOrgShft(3)
          
          call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
          point_z, t, spatial_sampler, temporal_sampler, bxx1(j,k))
@@ -254,46 +259,17 @@ subroutine pushMUI(ux1, uy1, uz1)
       real(mytype) :: eta_bl, f_bl, g_bl, x_bl,h_bl
       real(mytype) :: delta_int, delta_eta, eps_eta
 
-      real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z
+      real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
       integer :: i, j, k, is,iGrp
-      integer :: groupNumb  ! number of data groups to be pushed. The group is defined as a box 
-      integer, allocatable,dimension(:,:) :: groupVort,groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
-      integer, allocatable,dimension(:,:,:) :: cornLoc,corn
+      integer, allocatable,dimension(:,:) :: groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
+      ! integer, allocatable,dimension(:,:,:) :: cornLoc,corn
       groupNumb=1
-      allocate(groupVort(groupNumb,6),groupVortLocal(groupNumb,6))
-      allocate(cornLoc(groupNumb,8,3),corn(groupNumb,8,3))
-      groupVort(1,:)=[120,120,32,50,8,12]
-      cornLoc =0
-      ! groupVort(1,:)=[120,120,5,50,3,13]
-      
-      ! corn(1,1,:)=[groupVort(1,1),groupVort(1,3),groupVort(1,5)]
-      ! corn(1,2,:)=[groupVort(1,2),groupVort(1,3),groupVort(1,5)]
-      ! corn(1,3,:)=[groupVort(1,2),groupVort(1,3),groupVort(1,6)]
-      ! corn(1,4,:)=[groupVort(1,1),groupVort(1,3),groupVort(1,6)]
+      allocate(groupVortLocal(groupNumb,6))
 
-      ! corn(1,5,:)=[groupVort(1,1),groupVort(1,4),groupVort(1,5)]
-      ! corn(1,6,:)=[groupVort(1,2),groupVort(1,4),groupVort(1,5)]
-      ! corn(1,7,:)=[groupVort(1,2),groupVort(1,4),groupVort(1,6)]
-      ! corn(1,8,:)=[groupVort(1,1),groupVort(1,4),groupVort(1,6)]
-
-      ! do j = 1,8
-      !    if (corn(1,j,1) >=xstart(1) .and. corn(1,j,1) <=xend(1) ) then
-      !       if (corn(1,j,2) >=xstart(2) .and. corn(1,j,2) <=xend(2) ) then
-      !          if (corn(1,j,3) >=xstart(3) .and. corn(1,j,3) <=xend(3) ) then
-      !             cornLoc(1,j,1)=corn(1,j,1)-xstart(1)+1
-      !             cornLoc(1,j,2)=corn(1,j,2)-xstart(2)+1
-      !             cornLoc(1,j,3)=corn(1,j,3)-xstart(3)+1
-
-                  
-      !          endif
-      !       endif
-      !    endif
-
-      !    ! write (*,*) nrank, "/",cornLoc(1,j,:)
-      ! enddo
-      
-
-      ! stop
+      !!! DO NOT dx,dy,dz used in the code as their values depends on the BC not the actual grid spacing.
+      grdSpce(1) = xlx/(nx-1)
+      grdSpce(2) = yly/(ny-1)
+      grdSpce(3) = zlz/(nz-1)
 
       !!! Define the local index of points of each  group 
       groupVortLocal = 0
@@ -316,15 +292,17 @@ subroutine pushMUI(ux1, uy1, uz1)
          ! If a  group does not have a data in this local domain, set it to zero and -1. Use -1 to avoid entering the loop. 
          if (minval(groupVortLocal(iGrp,:)) ==0)  groupVortLocal(iGrp,:) = [0, 0, 0, -1, -1, -1]  
       enddo 
-      
+      ! write(*,*) nrank, groupVortLocal
       !/ Push data to MUI interface 
       do iGrp = 1, groupNumb
          do k=groupVortLocal(iGrp,5),groupVortLocal(iGrp,6)
             do j=groupVortLocal(iGrp,3),groupVortLocal(iGrp,4)
                do i=groupVortLocal(iGrp,1),groupVortLocal(iGrp,2)
-                  point_x = real((i+xstart(1)-1-1),mytype)*dx
-                  point_y = yp(j+xstart(2)-1)
-                  point_z = real((k+xstart(3)-1-1),mytype)*dz
+                  point_x = real((i+xstart(1)-1),mytype)*grdSpce(1)  + dataOrgShft(1)
+                  point_y = yp(j+xstart(2)-1) + dataOrgShft(2)
+                  point_z = real((k+xstart(3)-1),mytype)*grdSpce(3) + dataOrgShft(3)
+
+                  ! print *, "MUI Sending  at location", point_x, point_y, point_z
                   
                   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "ux"//c_null_char, point_x, &
                   point_y, point_z, ux1(i,j,k))
@@ -335,12 +313,15 @@ subroutine pushMUI(ux1, uy1, uz1)
                   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uz"//c_null_char, point_x, &
                   point_y, point_z, uz1(i,j,k))
 
+                  ! print *, "At ", point_x, point_y, point_z, "Xcompact 3d Pushed ux", ux1(i,j,k)
+
                enddo
             enddo
          enddo
+         call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
       enddo
 
-      call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
+      
       ! print *, nrank,"Group Vortext local  ", groupVortLocal(iGrp,:)
       
       ! do k = 1, xsize(3)
