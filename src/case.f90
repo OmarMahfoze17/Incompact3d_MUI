@@ -194,9 +194,6 @@ contains
     elseif (itype.eq.itype_tbl) then
 
        call boundary_conditions_tbl (ux, uy, uz, phi)
-   elseif (itype.eq.itype_MUIBC) then
-
-   call boundary_conditions_MUIBC (ux, uy, uz, phi)
 
     elseif (itype.eq.itype_abl) then
 
@@ -217,6 +214,11 @@ contains
     elseif (itype.eq.itype_pipe) then
 
        call boundary_conditions_pipe (ux, uy, uz, phi)
+#ifdef MUI_COUPLING
+   elseif (itype.eq.itype_MUIBC) then
+
+      call boundary_conditions_MUIBC (ux, uy, uz, phi)
+#endif
     else
          print *, "boundary_conditions error"
 

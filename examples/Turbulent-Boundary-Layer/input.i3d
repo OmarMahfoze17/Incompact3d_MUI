@@ -137,23 +137,5 @@ A_tr = 0.356625       !to be use with care, value is mesh-dependent
 !x0_tr_tbl=3.505082
 
 /End
-!================
-&MUICoupling
-!================
-
-domainName = 'xcompact3d'             ! LES Model (1: Phys Smag, 2: Phys WALE, 3: Phys dyn. Smag, 4: iSVV, 5: dyn SEV)
-interfaceName = 'interface'        ! Smagorinsky constant
-interface_count = 1      ! 1: Mason and Thomson Damping function, otherwise OFF
-interfaceDirection = 1, 1     ! This is an array to define the direction of all interfaces(1: normal to x-dir, 2: normal to x-dir, 3: normal to x-dir). 
-interfaceLocation  = 1, 120   ! This is an array to define the location of all interfaces. 
-MUIBC_ID = 1, 1, 1, 1, 1, 1   ! Associate an interface indentfied by MUIBC_ID to the boundary condition. 
-                              !i.e. MUIBC_ID(1) coresponds to the BC of x=0, MUIBC_ID(2) => BC at x=xlx, MUIBC_ID(3) => BC at y=0 , MUIBC_ID(4) =>  BC at y=yly
-                              !MUIBC_ID(5) => BC at z=0, MUIBC_ID(2) => BC at z=zlz
-groupNumb = 1
-groupVort(1,:) = 120, 120, 1, 129, 1, 32  ! Define box corners for group of points to be pushed
-dataOrgShft = 0, 0 ,0
-tolerance = 10e-37            ! tolerance needed when comparing equal values. Needed when exact spatial and temporal samplers are used. Default is 10e-37
-
-/End
 &CASE
 /End

@@ -6,7 +6,7 @@ program xcompact3d
 
   use var
   use case
-
+  use variables, only : MUIcommandArgs
   use transeq, only : calculate_transeq_rhs
   use time_integrators, only : int_time
   use navier, only : velocity_to_momentum, momentum_to_velocity, pre_correc, &
@@ -39,17 +39,21 @@ program xcompact3d
      
      do itr=1,iadvance_time
         call set_fluid_properties(rho1,mu1)
-        if (sendReceiveMode==1) then
+
+#ifdef MUI_COUPLING
+      ! Set the order of the coupling operations
+      if (trim(MUIcommandArgs).eq.trim('coupled')) then
+        if (sendReceiveMode==1) then ! Receive first 
             call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
             call pushMUI(ux1, uy1, uz1)
-        else if (sendReceiveMode==2) then
+        else if (sendReceiveMode==2) then  ! push first 
             call pushMUI(ux1, uy1, uz1)
-            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
-            
+            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)            
         else 
             write(*,*) "Wrong selction of sendReceiveMode to ", sendReceiveMode
         endif
-
+      endif
+#endif
         if (imove.eq.1) then ! update epsi for moving objects
           if ((iibm.eq.2).or.(iibm.eq.3)) then
              call genepsi3d(ep1)
@@ -129,7 +133,7 @@ use mpi_f08 , only : MPI_comm
   use param, only : irestart
 
   use variables, only : nx, ny, nz, nxm, nym, nzm
-  use variables, only : p_row, p_col
+  use variables, only : p_row, p_col,MUIcommandArgs
   use variables, only : nstat, nvisu, nprobe, ilist
   
 
@@ -151,7 +155,7 @@ use mpi_f08 , only : MPI_comm
 
   integer :: nargin, FNLength, status, DecInd
   logical :: back
-  character(len=80) :: InputFN, FNBase
+  character(len=80) :: InputFN, argTemp,FNBase
 
   character(:), allocatable :: uri
   TYPE(MPI_Comm) , pointer :: newcomm
@@ -166,23 +170,28 @@ use mpi_f08 , only : MPI_comm
 #endif
   call MPI_COMM_RANK(MUI_COMM_WORLD,nrank,ierr) 
   call MPI_COMM_SIZE(MUI_COMM_WORLD,nproc,ierr)
-
-  print *,  " xxxx " , nrank , nproc,MUI_COMM_WORLD
   ! Handle input file like a boss -- GD
   nargin=command_argument_count()
-  if (nargin <1) then
-     InputFN='input.i3d'
-     if (nrank==0) write(*,*) 'Xcompact3d is run with the default file -->', trim(InputFN)
-  elseif (nargin >= 1) then
-     call get_command_argument(1,InputFN,FNLength,status)
-     back=.true.
-     FNBase=inputFN((index(InputFN,'/',back)+1):len(InputFN))
-     DecInd=index(FNBase,'.',back)
-     if (DecInd >1) then
-        FNBase=FNBase(1:(DecInd-1))
-     end if
-     if (nrank==0) write(*,*) 'Xcompact3d is run with the provided file -->', trim(InputFN)
+     InputFN='./input.i3d'
+
+   if (nargin == 1) then
+     call get_command_argument(1,argTemp,FNLength,status)
+     if (trim(argTemp).eq.trim('coupled')) then
+      MUIcommandArgs = argTemp
+     else
+      InputFN = argTemp
+      back=.true.
+      FNBase=inputFN((index(InputFN,'/',back)+1):len(InputFN))
+      DecInd=index(FNBase,'.',back)
+      if (DecInd >1) then
+         FNBase=FNBase(1:(DecInd-1))
+      end if
+     endif
+   elseif (nargin== 2) then
+      Write(*,*) "Error: Need fexing if you are going to use more than one argument in the rum command"
+      STOP
   endif
+  if (nrank==0) write(*,*) 'Xcompact3d is run with the provided file --> ', trim(InputFN)
 
 #ifdef ADIOS2
   if (nrank .eq. 0) then
@@ -198,7 +207,7 @@ use mpi_f08 , only : MPI_comm
   
   call parameter(InputFN)
 #ifdef MUI_COUPLING
-  call MUI_create_sampler()
+if (trim(MUIcommandArgs).eq.trim('coupled')) call MUI_create_sampler()
 #endif
 
   call decomp_2d_init(nx,ny,nz,p_row,p_col,MUI_COMM_WORLD)
@@ -303,7 +312,7 @@ subroutine finalise_xcompact3d()
   use MPI
   use decomp_2d
   use decomp_2d_io, only : decomp_2d_io_finalise
-
+  use variables, only : MUIcommandArgs
   use tools, only : simu_stats
   use param, only : itype, jles, ilesmod
   use probes, only : finalize_probes
@@ -329,7 +338,7 @@ subroutine finalise_xcompact3d()
      endif
   endif
 #ifdef MUI_COUPLING
-  deallocate(uniface_pointers_3d)
+if (trim(MUIcommandArgs).eq.trim('coupled'))  deallocate(uniface_pointers_3d)
 #endif
   call simu_stats(4)
   call finalize_probes()

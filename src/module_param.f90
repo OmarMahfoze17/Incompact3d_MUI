@@ -36,7 +36,8 @@ module variables
 
   real(mytype),allocatable,dimension(:) :: sc,uset,cp,ri,group
   real(mytype) :: nu0nu, cnu
-
+  integer(c_int) :: MUI_COMM_WORLD
+  CHARACTER(LEN=50) :: MUIcommandArgs
 #ifndef DOUBLE_PREC
   integer,parameter :: prec = 4
 #else
@@ -61,19 +62,19 @@ module variables
   integer :: groupVort(200,6)
   !The domain is alwyes start at (0,0,0), but there are cases where 
   !data is needed to be pushed/fitched to/from domain that is shifted from 0  
-  real(mytype) :: dataOrgShft(3) = 0
+  real(mytype) :: dataOrgShft(3) = 0.0_mytype
 
   type(c_ptr), target :: uniface_3d=c_null_ptr
   type(c_ptr), target :: spatial_sampler=c_null_ptr
   type(c_ptr), target :: temporal_sampler=c_null_ptr
   real(c_double) :: tolerance=1e-37_c_double
   ! integer(c_int) :: MUI_COMM_WORLD
-  integer(c_int) :: MUI_COMM_WORLD
+  
   integer :: MUI_x1_ID,MUI_xn_ID,MUI_y1_ID,MUI_yn_ID,MUI_z1_ID,MUI_zn_ID   
   integer :: MUIBC_ID(6),sendReceiveMode
 
   ! RBF filter varaibles
-  real(c_double) :: rSampler = 1_c_double,hSampler = 0.5_c_double
+  real(c_double) :: rSampler = 1_c_double,hSampler = 1.0_c_double
 
   ABSTRACT INTERFACE
      SUBROUTINE MUI_FETCH_FUNS(uniface,attr,point_1,point_2,point_3,t,spatial_sampler, &
@@ -84,11 +85,8 @@ module variables
       character(kind=c_char), intent(in) :: attr(*)
       real(kind=c_double), intent(in) :: point_1,point_2,point_3,t
       real(kind=c_double), intent(out) :: return_value
-
      END SUBROUTINE MUI_FETCH_FUNS
-
   END INTERFACE
-
   PROCEDURE (MUI_FETCH_FUNS), POINTER :: mui_fetch
 
   

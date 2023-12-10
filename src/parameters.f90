@@ -78,9 +78,11 @@ subroutine parameter(input_i3d)
   NAMELIST /CASE/ pfront
   NAMELIST/ALMParam/iturboutput,NTurbines,TurbinesPath,NActuatorlines,ActuatorlinesPath,eps_factor,rho_air
   NAMELIST/ADMParam/Ndiscs,ADMcoords,iturboutput,rho_air,T_relax
+#ifdef MUI_COUPLING
   NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection, &
    interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,tolerance,sendReceiveMode, &
    sptlSmpType,tmpSmpType,rSampler,hSampler
+#endif
 
 
 
@@ -113,38 +115,32 @@ subroutine parameter(input_i3d)
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 #ifdef MUI_COUPLING
-    
-   read(10, nml=MUICoupling); rewind(10)  
-  allocate(character(len_trim(interfaceName)+5) :: interfaces3d(interface_count))
-  !For multi-domain function, "uniface_pointers_1d" should be used to collect the array of
-  ! MUI uniface pointers. It is decleared in the MUI FORTRAN wrapper.
-  allocate(uniface_pointers_3d(interface_count),ifsDir(interface_count),ifsLoc(interface_count))
+   if (trim(MUIcommandArgs).eq.trim('coupled')) then 
+      read(10, nml=MUICoupling); rewind(10)  
+      allocate(character(len_trim(interfaceName)+5) :: interfaces3d(interface_count))
+      !For multi-domain function, "uniface_pointers_1d" should be used to collect the array of
+      ! MUI uniface pointers. It is decleared in the MUI FORTRAN wrapper.
+      allocate(uniface_pointers_3d(interface_count),ifsDir(interface_count),ifsLoc(interface_count))
 
-  do ifsIndx = 1, interface_count
-   !Generate character type of number suffix
-   if (ifsIndx < 10) then
-       write (numberSuffix, "(I1)") ifsIndx
-   else if ((ifsIndx < 100) .and. (ifsIndx > 9)) then
-       write (numberSuffix, "(I2)") ifsIndx
-   else if ((ifsIndx < 1000) .and. (ifsIndx > 99)) then
-       write (numberSuffix, "(I3)") ifsIndx
-   else
-       write (numberSuffix, "(I4)") ifsIndx
+      do ifsIndx = 1, interface_count
+         !Generate character type of number suffix
+         if (ifsIndx < 10) then
+            write (numberSuffix, "(I1)") ifsIndx
+         else if ((ifsIndx < 100) .and. (ifsIndx > 9)) then
+            write (numberSuffix, "(I2)") ifsIndx
+         else if ((ifsIndx < 1000) .and. (ifsIndx > 99)) then
+            write (numberSuffix, "(I3)") ifsIndx
+         else
+            write (numberSuffix, "(I4)") ifsIndx
+         endif
+
+         !Create and collect interface names
+         interfaces3d(ifsIndx) = trim(interfaceName) // "_" // trim(numberSuffix)
+         ifsDir(ifsIndx)=interfaceDirection(ifsIndx)
+         ifsLoc(ifsIndx)=interfaceLocation(ifsIndx)
+      end do 
+      call create_and_get_uniface_multi_3d_f(uniface_pointers_3d, trim(domainName), interfaces3d, interface_count)
    endif
-
-   !Create and collect interface names
-   interfaces3d(ifsIndx) = trim(interfaceName) // "_" // trim(numberSuffix)
-   ifsDir(ifsIndx)=interfaceDirection(ifsIndx)
-   ifsLoc(ifsIndx)=interfaceLocation(ifsIndx)
- end do 
-  call create_and_get_uniface_multi_3d_f(uniface_pointers_3d, trim(domainName), interfaces3d, interface_count)
-!   call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
-!   call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
-
-  
-!   print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-!   print *, " Xcompact3d created the intereface"
-!   print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 #endif
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -600,6 +596,27 @@ subroutine parameter(input_i3d)
   if (iibm.eq.3) then ! This is only for the Cubic Spline Reconstruction
      npif=npif+1
   endif
+
+  if (nclx1==3.or.nclxn==3.or.ncly1==3.or.nclyn==3.or.nclz1==3.or.nclzn==3) then
+   if (trim(MUIcommandArgs).eq.trim('coupled')) then 
+      if (nrank==0) then
+         write(*,*) '==========================================================='
+         write(*,*) '=========== Using a coupled boundary Conditions ==========='
+         write(*,*) '==========================================================='
+      endif
+   else
+      if (nrank==0) then
+         write(*,*) '==========================================================='
+         write(*,*) 'Error: Using a coupled boundary Conditions, but Coupling is not activated'
+         write(*,*) ' Activate the coupling mode by adding the argument `coupled` to run command '
+         write(*,*) ' i.e. ./xcompact3d couled '
+         write(*,*) '==========================================================='
+      endif
+      stop
+   endif
+  endif
+
+
 
 #ifdef DEBG
   if (nrank == 0) write(*,*) '# parameter done'

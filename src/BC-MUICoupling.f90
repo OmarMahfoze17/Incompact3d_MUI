@@ -60,15 +60,15 @@ contains
     endif
     ux1=zero;uy1=zero;uz1=zero
 
-    !a blasius profile is created in ecoule and then duplicated for the all domain
-   !  if (nclx1==2) then ! Use the orignial TBL inlet conditions 
+   !  a blasius profile is created in ecoule and then duplicated for the all domain
+    if (nclx1==2) then ! Use the orignial TBL inlet conditions 
       call blasius()   
-   !  elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
-   !    call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location
-   !  else
-   !    print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
-   !    stop
-   !  endif
+    elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
+      call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location
+    else
+      print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
+      stop
+    endif
 
     do k=1,xsize(3)
        do j=1,xsize(2)
@@ -129,15 +129,13 @@ contains
        enddo
     endif
 
-    !OUTFLOW based on a 1D convection equation
-
     udx=one/dx
     udy=one/dy
     udz=one/dz
     uddx=half/dx
     uddy=half/dy
     uddz=half/dz
-    if (nclxn==2) then ! Use the orignial TBL outlet conditions 
+    if (nclxn==2) then !OUTFLOW based on a 1D convection equation
       do k=1,xsize(3)
          do j=1,xsize(2)
 
@@ -192,7 +190,6 @@ contains
           endif
     endif
     endif
-
     !update of the flow rate (what is coming in the domain is getting out)
     call tbl_flrt(ux,uy,uz)
 
@@ -223,8 +220,6 @@ contains
     grdSpce(2) = yly/(ny-1)
     grdSpce(3) = zlz/(nz-1)
     
-
-    print *, "Fetched 3D interface values at time  ",t
     do k = 1, xsize(3)
       do j = 1, xsize(2)
          point_x = xLoc + dataOrgShft(1)
@@ -232,20 +227,12 @@ contains
          point_z = real((k+xstart(3)-1-1),mytype)*grdSpce(3) + dataOrgShft(3)
          ! if (xLoc==xlx)print *, "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
 
-         ! call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
-         ! point_z, t, spatial_sampler, temporal_sampler, bxx(j,k))
-         ! call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, point_x, point_y, &
-         ! point_z, t, spatial_sampler, temporal_sampler, bxy(j,k))
-         ! call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
-         ! point_z, t, spatial_sampler, temporal_sampler, bxz(j,k))
-
          call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
          point_z, t, spatial_sampler, temporal_sampler, bxx(j,k))
          call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, point_x, point_y, &
          point_z, t, spatial_sampler, temporal_sampler, bxy(j,k))
          call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
          point_z, t, spatial_sampler, temporal_sampler, bxz(j,k))
-
          ! print *, bxx(j,k)
 
       end do
@@ -275,11 +262,9 @@ subroutine pushMUI(ux1, uy1, uz1)
       real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
       integer :: i, j, k, is,iGrp
       integer, allocatable,dimension(:,:) :: groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
-      ! integer, allocatable,dimension(:,:,:) :: cornLoc,corn
       groupNumb=1
       allocate(groupVortLocal(groupNumb,6))
-
-      !!! DO NOT dx,dy,dz used in the code as their values depends on the BC not the actual grid spacing.
+      !!! DO NOT use dx,dy,dz used in the code as their values depends on the BC not the actual grid spacing.
       grdSpce(1) = xlx/(nx-1)
       grdSpce(2) = yly/(ny-1)
       grdSpce(3) = zlz/(nz-1)
@@ -316,18 +301,12 @@ subroutine pushMUI(ux1, uy1, uz1)
                   point_z = real((k+xstart(3)-1-1),mytype)*grdSpce(3) + dataOrgShft(3)
 
                   ! if (point_x==50.0)print *, "MUI domain ",trim(domainName)," is sending at location", point_x, point_y, point_z
-                  
                   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "ux"//c_null_char, point_x, &
                   point_y, point_z, ux1(i,j,k))
-
                   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uy"//c_null_char, point_x, &
                   point_y, point_z, uy1(i,j,k))
-
                   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uz"//c_null_char, point_x, &
-                  point_y, point_z, uz1(i,j,k))
-
-                  
-
+                  point_y, point_z, uz1(i,j,k))               
                   ! print *, "At ", point_x, point_y, point_z, "Xcompact 3d Pushed ux", ux1(i,j,k)
 
                enddo
@@ -335,27 +314,6 @@ subroutine pushMUI(ux1, uy1, uz1)
          enddo
          call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
       enddo
-
-      
-      ! print *, nrank,"Group Vortext local  ", groupVortLocal(iGrp,:)
-      
-      ! do k = 1, xsize(3)
-      ! do j = 1, xsize(2)
-      !    point_x = 0.0_mytype
-      !    point_y = yp(j+xstart(2)-1)
-      !    point_z = real((k+xstart(3)-1-1),mytype)*dz
-         
-      !    call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
-      !    point_z, t, spatial_sampler, temporal_sampler, bxx1(j,k))
-
-      !    call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, point_x, point_y, &
-      !    point_z, t, spatial_sampler, temporal_sampler, bxy1(j,k))
-
-      !    call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
-      !    point_z, t, spatial_sampler, temporal_sampler, bxz1(j,k))
-
-      !    end do
-      ! end do
 
       
 end subroutine pushMUI
@@ -369,7 +327,7 @@ subroutine MUI_create_sampler()
 #endif
       use decomp_2d_io
       use MPI
-
+   !!! Set spatial sampler 
    if (trim(sptlSmpType)==trim('exact')) then
       call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
       if (nrank==0) then
@@ -388,22 +346,33 @@ subroutine MUI_create_sampler()
          write(*,*)  "     - Tolerance = ", tolerance
          write(*,*)  "======================================================="
       endif
-   else if (trim(sptlSmpType)==trim('RPF')) then
+   else if (trim(sptlSmpType)==trim('RBF')) then
       !! to be added 
       if (nrank==0) then 
          Write(*,*) trim(sptlSmpType), "To be added"
-         write(*,*) "The available spatial samplers are exact, RPF"
+         write(*,*) "The available spatial samplers are exact, RBF"
       endif
       stop
    else
       if (nrank==0) then 
          Write(*,*) trim(sptlSmpType), "is wrong option for MUI spatial Sampler"
-         write(*,*) "The available spatial samplers are exact, RPF"
+         write(*,*) "The available spatial samplers are exact, RBF"
          write(*,*)  "======================================================="
       endif
       stop
    endif
 
+   !!! Set Temporal sampler 
+   if (trim(tmpSmpType)==trim('exact')) then
+      call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
+   else
+      if (nrank==0) then 
+         write(*,*) "MUI Error: The temporal sampler ", tmpSmpType, "is not implemented"
+      endif
+      stop
+   endif
+
+   ! Set the fetch function 
    if (trim(sptlSmpType)==trim('exact') .and. trim(tmpSmpType)==trim('exact') ) then
       mui_fetch => mui_fetch_exact_exact_3d_f
    else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('exact')) then
@@ -414,11 +383,6 @@ subroutine MUI_create_sampler()
       endif
       stop
    endif
-
-   call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
-
-
-
 
 end subroutine MUI_create_sampler
 
