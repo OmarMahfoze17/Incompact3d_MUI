@@ -29,7 +29,7 @@ re  = 1250.           ! nu=1/re (Kinematic Viscosity)
 ! Time stepping
 dt = 0.01             ! Time step
 ifirst = 1            ! First iteration
-ilast = 1000         ! Last iteration
+ilast = 100000         ! Last iteration
 
 ! Enable modelling tools
 ilesmod=1             ! if 0 then DNS
@@ -44,7 +44,7 @@ init_noise = 0.0      ! Turbulence intensity (1=100%) !! Initial condition
 inflow_noise = 0.0    ! Turbulence intensity (1=100%) !! Inflow condition
 
 nclx1 = 2
-nclxn = 2
+nclxn = 3
 ncly1 = 2
 nclyn = 2
 nclz1 = 0
@@ -141,7 +141,7 @@ A_tr = 0.356625       !to be use with care, value is mesh-dependent
 &MUICoupling
 !================
 
-domainName = 'xcompact3d'             ! LES Model (1: Phys Smag, 2: Phys WALE, 3: Phys dyn. Smag, 4: iSVV, 5: dyn SEV)
+domainName = 'Sender'             ! LES Model (1: Phys Smag, 2: Phys WALE, 3: Phys dyn. Smag, 4: iSVV, 5: dyn SEV)
 interfaceName = 'interface'        ! Smagorinsky constant
 interface_count = 1      ! 1: Mason and Thomson Damping function, otherwise OFF
 interfaceDirection = 1, 1     ! This is an array to define the direction of all interfaces(1: normal to x-dir, 2: normal to x-dir, 3: normal to x-dir). 
@@ -153,7 +153,11 @@ groupNumb = 1
 groupVort(1,:) = 120, 120, 1, 129, 1, 32  ! Define box corners for group of points to be pushed
 dataOrgShft = 0, 0 ,0
 tolerance = 10e-7            ! tolerance needed when comparing equal values. Needed when exact spatial and temporal samplers are used. Default is 10e-37
-sendReceiveMode = 2          ! Define the order of the push and fetch operation. 1: receive first then send, 2: send first             
+sendReceiveMode = 2          ! Define the order of the push and fetch operation. 1: receive first then send, 2: send first   
+sptlSmpType = 'gauss'        ! Selection of the spatial sampler. Options: exact, gauss, OTHERS TO BE ADDED
+tmpSmpType  = 'exact'	     ! Selection of the spatial sampler. Options: exact, OTHERS TO BE ADDED
+rSampler        = 0.05         ! Radius of the spatial interpolation. Default is 1
+hSampler        = 0.05         ! . Default is 1           
 /End
 &CASE
 /End

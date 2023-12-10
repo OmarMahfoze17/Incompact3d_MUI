@@ -49,8 +49,8 @@ module variables
 
 #ifdef MUI_COUPLING
   ! Coupling varaibles 
-  character(len=1024) :: domainName
-  character(len=1024) :: interfaceName
+  character(len=1024) :: domainName, interfaceName
+  character(len=1024) :: sptlSmpType,tmpSmpType
   character(len=1024) :: arg_interface_count
   integer(c_int) :: interface_count
   character(:), allocatable, target :: interfaces3d(:)
@@ -72,6 +72,26 @@ module variables
   integer :: MUI_x1_ID,MUI_xn_ID,MUI_y1_ID,MUI_yn_ID,MUI_z1_ID,MUI_zn_ID   
   integer :: MUIBC_ID(6),sendReceiveMode
 
+  ! RBF filter varaibles
+  real(c_double) :: rSampler = 1_c_double,hSampler = 0.5_c_double
+
+  ABSTRACT INTERFACE
+     SUBROUTINE MUI_FETCH_FUNS(uniface,attr,point_1,point_2,point_3,t,spatial_sampler, &
+      temporal_sampler,return_value)
+       use decomp_2d, only : mytype
+       import :: c_ptr,c_char,c_double
+      type(c_ptr), intent(in), value :: uniface,spatial_sampler,temporal_sampler
+      character(kind=c_char), intent(in) :: attr(*)
+      real(kind=c_double), intent(in) :: point_1,point_2,point_3,t
+      real(kind=c_double), intent(out) :: return_value
+
+     END SUBROUTINE MUI_FETCH_FUNS
+
+  END INTERFACE
+
+  PROCEDURE (MUI_FETCH_FUNS), POINTER :: mui_fetch
+
+  
   
 #endif
 

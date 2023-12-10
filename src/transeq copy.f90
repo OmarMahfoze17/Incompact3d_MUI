@@ -773,12 +773,12 @@ contains
 
     !! Y-gravity
     if (abs(gravy) > tiny(gravy)) then
-    if (nclx1.eq.2) then
+    if (nclx1.eq.2.or. nclx1.eq.3) then
        istart = 2
     else
        istart = 1
     endif
-    if (nclxn.eq.2) then
+    if (nclxn.eq.2 .or. nclxn.eq.3) then
        iend = xsize(1) - 1
     else
        iend = xsize(1)
@@ -814,12 +814,12 @@ contains
 
     !! Z-gravity
     if (abs(gravz) > tiny(gravz)) then
-    if (nclx1.eq.2) then
+    if (nclx1.eq.2.or. nclx1.eq.3) then
        istart = 2
     else
        istart = 1
     endif
-    if (nclxn.eq.2) then
+    if (nclxn.eq.2 .or. nclxn.eq.3) then
        iend = xsize(1) - 1
     else
        iend = xsize(1)

@@ -436,7 +436,7 @@ contains
     endif
 
     !we are in X pencils:
-    if (nclx1.eq.2  .or. nclx1.eq.3) then
+    if (nclx1.eq.2 .or. nclx1.eq.3) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyx1(j,k)=py1(1,j,k)/gdt(itr)
@@ -444,7 +444,7 @@ contains
           enddo
        enddo
     endif
-    if (nclxn.eq.2) then
+    if (nclxn.eq.2 .or. nclxn.eq.3) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyxn(j,k)=py1(nx,j,k)/gdt(itr)
@@ -534,7 +534,7 @@ contains
 
     !********NCLX==2*************************************
     !we are in X pencils:
-    if ((itype.eq.itype_channel.or.itype.eq.itype_uniform.or.itype.eq.itype_abl).and.((nclx1==2 .or. nclx1.eq.3).and.nclxn==2)) then
+    if ((itype.eq.itype_channel.or.itype.eq.itype_uniform.or.itype.eq.itype_abl).and.((nclx1==2 .or. nclx1.eq.3).and.(nclxn==2 .or. nclxn.eq.3))) then
 
        !Computation of the flow rate Inflow/Outflow
        ut1=zero
@@ -580,7 +580,7 @@ contains
           enddo
        enddo
     endif
-    if (nclxn==2) then
+    if (nclxn==2 .or. nclxn==3) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyxn(j,k)=dpdyxn(j,k)*gdt(itr)

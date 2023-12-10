@@ -29,7 +29,7 @@ re  = 1250.           ! nu=1/re (Kinematic Viscosity)
 ! Time stepping
 dt = 0.01             ! Time step
 ifirst = 1            ! First iteration
-ilast = 1000         ! Last iteration
+ilast = 100000         ! Last iteration
 
 ! Enable modelling tools
 ilesmod=1             ! if 0 then DNS
@@ -129,7 +129,7 @@ iconserv = 0          ! Formulation SGS divergence (0: non conservative, 1: cons
 !================
 &Tripping
 !================
-itrip=1               !1 to activate the tripping for TBL, 0 otherwise for LBL 
+itrip=0               !1 to activate the tripping for TBL, 0 otherwise for LBL 
 A_tr = 0.356625       !to be use with care, value is mesh-dependent
 !xs_tr_tbl=1.402033       
 !ys_tr_tbl=0.350508       
@@ -149,11 +149,15 @@ interfaceLocation  = 1, 120   ! This is an array to define the location of all i
 MUIBC_ID = 1, 1, 1, 1, 1, 1   ! Associate an interface indentfied by MUIBC_ID to the boundary condition. 
                               !i.e. MUIBC_ID(1) coresponds to the BC of x=0, MUIBC_ID(2) => BC at x=xlx, MUIBC_ID(3) => BC at y=0 , MUIBC_ID(4) =>  BC at y=yly
                               !MUIBC_ID(5) => BC at z=0, MUIBC_ID(2) => BC at z=zlz
-groupNumb = 0
-groupVort(1,:) = 129, 129, 129, 129, 1, 1  ! Define box corners for group of points to be pushed
-dataOrgShft = 46.875, 0 ,0
+groupNumb = 1
+groupVort(1,:) = 10, 10, 1, 129, 1, 32  ! Define box corners for group of points to be pushed
+dataOrgShft = 46.48, 0 ,0
 tolerance = 10e-7            ! tolerance needed when comparing equal values. Needed when exact spatial and temporal samplers are used. Default is 10e-37
 sendReceiveMode = 1          ! Define the order of the push and fetch operation. 1: receive first then send, 2: send first
+sptlSmpType = 'gauss'        ! Selection of the spatial sampler. Options: exact, gauss, OTHERS TO BE ADDED
+tmpSmpType  = 'exact'	     ! Selection of the spatial sampler. Options: exact, OTHERS TO BE ADDED
+rSampler        = 0.05         ! Radius of the spatial interpolation. Default is 1
+hSampler        = 0.05         ! . Default is 1
 
 /End
 &CASE

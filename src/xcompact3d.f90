@@ -16,13 +16,13 @@ program xcompact3d
   use ibm_param
   use ibm, only : body
   use genepsi, only : genepsi3d
-  use MUIcoupledBC, only : pushMUI
+  use MUIcoupledBC, only : pushMUI, MUI_create_sampler
 
   implicit none
 
-
+  
   call init_xcompact3d()
-
+  
   do itime=ifirst,ilast
      !t=itime*dt
      t=t0 + (itime0 + itime + 1 - ifirst)*dt
@@ -142,7 +142,9 @@ use mpi_f08 , only : MPI_comm
   use ibm, only : body
 
   use probes, only : init_probes
-
+#ifdef MUI_COUPLING
+  use MUIcoupledBC, only : pushMUI, MUI_create_sampler
+#endif
   implicit none
 
   integer :: ierr
@@ -195,6 +197,9 @@ use mpi_f08 , only : MPI_comm
 #endif
   
   call parameter(InputFN)
+#ifdef MUI_COUPLING
+  call MUI_create_sampler()
+#endif
 
   call decomp_2d_init(nx,ny,nz,p_row,p_col,MUI_COMM_WORLD)
   call decomp_2d_io_init()

@@ -33,6 +33,11 @@ subroutine schemes()
   if (nclx1.eq.2.and.nclxn.eq.2) derx => derx_22
   if (nclx1.eq.3.and.nclxn.eq.1) derx => derx_21
   if (nclx1.eq.3.and.nclxn.eq.2) derx => derx_22
+
+  if (nclx1.eq.1.and.nclxn.eq.3) derx => derx_12
+  if (nclx1.eq.2.and.nclxn.eq.3) derx => derx_22
+  if (nclx1.eq.3.and.nclxn.eq.3) derx => derx_22
+
   !
   if (ncly1.eq.0.and.nclyn.eq.0) dery => dery_00
   if (ncly1.eq.1.and.nclyn.eq.1) dery => dery_11
@@ -54,6 +59,10 @@ subroutine schemes()
   if (nclx1.eq.2.and.nclxn.eq.2) derxx => derxx_22
   if (nclx1.eq.3.and.nclxn.eq.1) derxx => derxx_21
   if (nclx1.eq.3.and.nclxn.eq.2) derxx => derxx_22
+
+  if (nclx1.eq.1.and.nclxn.eq.3) derxx => derxx_12
+  if (nclx1.eq.2.and.nclxn.eq.3) derxx => derxx_22
+  if (nclx1.eq.3.and.nclxn.eq.3) derxx => derxx_22
   !y
   if (ncly1.eq.0.and.nclyn.eq.0) deryy => deryy_00
   if (ncly1.eq.1.and.nclyn.eq.1) deryy => deryy_11
@@ -361,7 +370,7 @@ subroutine first_derivative(alfa1,af1,bf1,cf1,df1,alfa2,af2,alfan,afn,bfn,&
      fb(n-2)=alfai
      fb(n-1)=alfai+alfai
      fb(n  )=zero
-  elseif (ncln.eq.2) then !Dirichlet
+  elseif (ncln.eq.2 .or. ncln.eq.3) then !Dirichlet
      ff(n-2)=alfai
      ff(n-1)=alfam
      ff(n)  =zero
@@ -610,7 +619,7 @@ subroutine second_derivative(alsa1,as1,bs1,&
      sb(n-2)=alsai
      sb(n-1)=alsai+alsai
      sb(n  )=zero
-  elseif (ncln.eq.2) then !Dirichlet
+  elseif (ncln.eq.2 .or. ncln.eq.3) then !Dirichlet
      sf(n-4)=alsai
      sf(n-3)=alsatt
      sf(n-2)=alsat
@@ -788,7 +797,7 @@ subroutine interpolation(dx,nxm,nx,nclx1,nclxn,&
   cicx6(nxm-1)=one
   if (nclxn==0) cicx6(nxm)=one + ailcaix6*ailcaix6
   if (nclxn==1) cicx6(nxm)=one + ailcaix6
-  if (nclxn==2) cicx6(nxm)=one + ailcaix6
+  if (nclxn==2 .or. nclxn==3) cicx6(nxm)=one + ailcaix6
   cibx6(1)=ailcaix6
   cibx6(2)=ailcaix6
   cibx6(nxm-2)=ailcaix6
@@ -848,7 +857,7 @@ subroutine interpolation(dx,nxm,nx,nclx1,nclxn,&
      call prepare (cbi6,cci6,cfip6,csip6,cwip6,nx)
      call prepare (cibi6,cici6,cifip6,cisip6,ciwip6,nx)
   endif
-  if (nclxn.eq.2) then
+  if (nclxn.eq.2 .or. nclxn.eq.3) then
      cbx6(nxm-1)=zero
      cibx6(nxm)=zero
      cbi6(nx-1)=zero

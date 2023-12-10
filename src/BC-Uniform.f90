@@ -97,13 +97,13 @@ contains
     real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ux,uy,uz
     real(mytype),dimension(xsize(1),xsize(2),xsize(3),numscalar) :: phi
 
-    if (nclx1.eq.2) then
+    if (nclx1.eq.2.or. nclx1.eq.3) then
       if (iscalar.eq.0.or.(iscalar.eq.1.and.nclxS1.eq.2)) then
         call inflow(ux,uy,uz,phi)
       endif
     endif
 
-    if (nclxn.eq.2) then
+    if (nclxn.eq.2 .or. nclxn.eq.3) then
       if (iscalar.eq.0.or.(iscalar.eq.1.and.nclxSn.eq.2)) then
         call outflow(ux,uy,uz,phi)
       endif

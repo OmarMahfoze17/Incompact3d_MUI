@@ -36,6 +36,7 @@ subroutine parameter(input_i3d)
   use iso_c_binding
   use mui_3d_f
   use mui_general_f
+
 #endif
   implicit none
 
@@ -78,7 +79,8 @@ subroutine parameter(input_i3d)
   NAMELIST/ALMParam/iturboutput,NTurbines,TurbinesPath,NActuatorlines,ActuatorlinesPath,eps_factor,rho_air
   NAMELIST/ADMParam/Ndiscs,ADMcoords,iturboutput,rho_air,T_relax
   NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection, &
-   interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,tolerance,sendReceiveMode
+   interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,tolerance,sendReceiveMode, &
+   sptlSmpType,tmpSmpType,rSampler,hSampler
 
 
 
@@ -136,8 +138,10 @@ subroutine parameter(input_i3d)
    ifsLoc(ifsIndx)=interfaceLocation(ifsIndx)
  end do 
   call create_and_get_uniface_multi_3d_f(uniface_pointers_3d, trim(domainName), interfaces3d, interface_count)
-  call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
-  call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
+!   call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
+!   call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
+
+  
 !   print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 !   print *, " Xcompact3d created the intereface"
 !   print *, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
