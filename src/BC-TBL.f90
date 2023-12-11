@@ -87,6 +87,7 @@ contains
     integer :: i, j, k, is
 
     !INFLOW with an update of bxx1, byy1 and bzz1 at the inlet
+
     call blasius()
     !INLET FOR SCALAR, TO BE CONSISTENT WITH INITIAL CONDITION
     if (iscalar==1) then

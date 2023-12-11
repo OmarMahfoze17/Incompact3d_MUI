@@ -233,7 +233,6 @@ contains
          point_z, t, spatial_sampler, temporal_sampler, bxy(j,k))
          call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
          point_z, t, spatial_sampler, temporal_sampler, bxz(j,k))
-         ! print *, bxx(j,k)
 
       end do
    end do
@@ -286,11 +285,18 @@ subroutine pushMUI(ux1, uy1, uz1)
                groupVortLocal(iGrp,i+1) = xSize(j)
             endif
 
+            if (groupVort(iGrp,i)<=xstart(j) .and. groupVort(iGrp,i+1) >=xend(j)) then
+               groupVortLocal(iGrp,i) =1
+               groupVortLocal(iGrp,i+1) = xSize(j)
+            endif
+
          enddo
          ! If a  group does not have a data in this local domain, set it to zero and -1. Use -1 to avoid entering the loop. 
          if (minval(groupVortLocal(iGrp,:)) ==0)  groupVortLocal(iGrp,:) = [0, 0, 0, -1, -1, -1]  
       enddo 
       ! write(*,*) nrank, groupVortLocal
+
+      ! stop 
       !/ Push data to MUI interface 
       do iGrp = 1, groupNumb
          do k=groupVortLocal(iGrp,5),groupVortLocal(iGrp,6)
@@ -336,6 +342,16 @@ subroutine MUI_create_sampler()
          write(*,*)  "     - Tolerance =", tolerance
          write(*,*)  "======================================================="
       endif
+   else if (trim(sptlSmpType)==trim('linear')) then
+      call mui_create_sampler_pseudo_n2_linear_3d_f(spatial_sampler,rSampler)
+      if (nrank==0) then
+         write(*,*) "MUI spatial Sampler is created with: "
+         write(*,*)  "     - Type      =   ", trim(sptlSmpType)
+         write(*,*)  "     - rSampler  = ", rSampler
+         write(*,*)  "     - hSampler  = ", hSampler
+         write(*,*)  "     - Tolerance = ", tolerance
+         write(*,*)  "======================================================="
+      endif
    else if (trim(sptlSmpType)==trim('gauss')) then
       call mui_create_sampler_gauss_3d_f(spatial_sampler,rSampler,hSampler)
       if (nrank==0) then
@@ -377,6 +393,8 @@ subroutine MUI_create_sampler()
       mui_fetch => mui_fetch_exact_exact_3d_f
    else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('exact')) then
       mui_fetch => mui_fetch_gauss_exact_3d_f
+   else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('exact')) then   
+      mui_fetch => mui_fetch_pseudo_n2_linear_exact_3d_f
    else
       if (nrank==0) then 
          write(*,*) "The selected spatial and temporal sampler types have not impelemnted yet"

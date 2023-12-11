@@ -1,4 +1,5 @@
 #!/bin/bash
+rm LOG
 rm -rf */data* 
 rm -rf */out
 rm -rf */prob* 

@@ -8,6 +8,7 @@ module actuator_disc_model
     use decomp_2d, only: real_type
     use actuator_line_model_utils 
     use airfoils
+    use variables, only :  MUI_COMM_WORLD
 
     implicit none
     

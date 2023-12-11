@@ -5,7 +5,7 @@
 !===================
 
 ! Flow type (1=Lock-exchange, 2=TGV, 3=Channel, 4=Periodic hill, 5=Cylinder, 6=dbg-schemes, 9=Turbulent-Boundary-Layer)
-itype = 15
+itype = 9
 
 ! Domain decomposition
 p_row=0               ! Row partition
@@ -29,7 +29,7 @@ re  = 1250.           ! nu=1/re (Kinematic Viscosity)
 ! Time stepping
 dt = 0.01             ! Time step
 ifirst = 1            ! First iteration
-ilast = 5         ! Last iteration
+ilast = 25000         ! Last iteration
 
 ! Enable modelling tools
 ilesmod=1             ! if 0 then DNS
@@ -76,8 +76,8 @@ cnu = 0.33               ! Ratio between hypervisvosity at k_m=2/3pi and k_c= pi
 
 ! Basic I/O
 irestart = 0          ! Read initial flow field ?
-icheckpoint = 500     ! Frequency for writing backup file
-ioutput = 500         ! Frequency for visualization
+icheckpoint = 5000     ! Frequency for writing backup file
+ioutput = 5000         ! Frequency for visualization
 ilist = 1            ! Frequency for writing to screen        
 nvisu = 1             ! Size for visualisation collection
 

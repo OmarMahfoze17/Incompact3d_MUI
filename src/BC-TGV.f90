@@ -222,7 +222,7 @@ contains
 
     USE decomp_2d
     USE decomp_2d_io
-    USE variables, only: nx,ny,nz
+    USE variables, only: nx,ny,nz,MUI_COMM_WORLD
     USE MPI
     USE var, only: nut1, srt_smag 
     USE var, only : uvisu, ux2, uy2, uz2, ux3, uy3, uz3
@@ -515,7 +515,7 @@ contains
 
     USE decomp_2d_io
     USE MPI
-
+    use variables, only : MUI_COMM_WORLD
     implicit none
 
     real(mytype),intent(in),dimension(xsize(1),xsize(2),xsize(3),numscalar) :: phi1

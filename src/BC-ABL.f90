@@ -843,6 +843,7 @@ contains
     use var
     use MPI
     use dbg_schemes, only: log_prec
+    use variables, only : MUI_COMM_WORLD
 
     implicit none
 

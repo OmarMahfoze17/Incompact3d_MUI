@@ -20,9 +20,9 @@ program xcompact3d
 
   implicit none
 
-  
+
   call init_xcompact3d()
-  
+
   do itime=ifirst,ilast
      !t=itime*dt
      t=t0 + (itime0 + itime + 1 - ifirst)*dt
@@ -32,12 +32,14 @@ program xcompact3d
      if (iin.eq.3.and.mod(itime,ntimesteps)==1) then
         call read_inflow(ux_inflow,uy_inflow,uz_inflow,itime/ntimesteps)
      endif
+
      if ((itype.eq.itype_abl.or.iturbine.ne.0).and.(ifilter.ne.0).and.(ilesmod.ne.0)) then
         call filter(C_filter)
         call apply_spatial_filter(ux1,uy1,uz1,phi1)
      endif
-     
+
      do itr=1,iadvance_time
+
         call set_fluid_properties(rho1,mu1)
 
 #ifdef MUI_COUPLING
@@ -51,7 +53,10 @@ program xcompact3d
             call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)            
         else 
             write(*,*) "Wrong selction of sendReceiveMode to ", sendReceiveMode
+            stop
         endif
+      else
+         call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
       endif
 #endif
         if (imove.eq.1) then ! update epsi for moving objects
@@ -65,15 +70,19 @@ program xcompact3d
 #ifdef DEBG
         call check_transients()
 #endif
+        
         if (ilmn) then
            !! XXX N.B. from this point, X-pencil velocity arrays contain momentum (LMN only).
            call velocity_to_momentum(rho1,ux1,uy1,uz1)
         endif
+
         call int_time(rho1,ux1,uy1,uz1,phi1,drho1,dux1,duy1,duz1,dphi1)
         call pre_correc(ux1,uy1,uz1,ep1)
+
         call calc_divu_constraint(divu3,rho1,phi1)
         call solve_poisson(pp3,px1,py1,pz1,rho1,ux1,uy1,uz1,ep1,drho1,divu3)
         call cor_vel(ux1,uy1,uz1,px1,py1,pz1)
+
         if (ilmn) then
            call momentum_to_velocity(rho1,ux1,uy1,uz1)
            !! XXX N.B. from this point, X-pencil velocity arrays contain velocity (LMN only).
@@ -82,11 +91,8 @@ program xcompact3d
         
         call test_flow(rho1,ux1,uy1,uz1,phi1,ep1,drho1,divu3)
 
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        !!!!     ADD the data send call !!!!!!!!!!!!!!!!!!!!!!!!
-        !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
      enddo !! End sub timesteps
-     
+
      call restart(ux1,uy1,uz1,dux1,duy1,duz1,ep1,pp3(:,:,:,1),phi1,dphi1,px1,py1,pz1,rho1,drho1,mu1,1)
 
      call simu_stats(3) ! screen/log output
@@ -102,7 +108,7 @@ end program xcompact3d
 !########################################################################
 subroutine init_xcompact3d()
 
-  use mpi
+  use MPI
   use decomp_2d
   use decomp_2d_io, only : decomp_2d_io_init
   USE decomp_2d_poisson, ONLY : decomp_2d_poisson_init
@@ -135,7 +141,6 @@ use mpi_f08 , only : MPI_comm
   use variables, only : nx, ny, nz, nxm, nym, nzm
   use variables, only : p_row, p_col,MUIcommandArgs
   use variables, only : nstat, nvisu, nprobe, ilist
-  
 
   use les, only: init_explicit_les
   use turbine, only: init_turbines
@@ -157,9 +162,6 @@ use mpi_f08 , only : MPI_comm
   logical :: back
   character(len=80) :: InputFN, argTemp,FNBase
 
-  character(:), allocatable :: uri
-  TYPE(MPI_Comm) , pointer :: newcomm
-  integer(C_SIZE_T) :: strlen=8
   !! Initialise MPI
 !   
 #ifdef MUI_COUPLING

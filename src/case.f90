@@ -174,7 +174,9 @@ contains
        call boundary_conditions_tgv (ux, uy, uz, phi)
 
     elseif (itype.eq.itype_channel) then
+
        call boundary_conditions_channel (ux, uy, uz, phi)
+
     elseif (itype.eq.itype_hill) then
 
        call boundary_conditions_hill (ux,uy,uz,phi,ep)
@@ -535,6 +537,7 @@ contains
     real(mytype), dimension(xsize(1), xsize(2), xsize(3), ntime) :: dux1, duy1, duz1
 
     if (itype.eq.itype_channel) then
+
        call momentum_forcing_channel(dux1, duy1, duz1, ux1, uy1, uz1)
 
 !!!    elseif (itype.eq.itype_jet) then

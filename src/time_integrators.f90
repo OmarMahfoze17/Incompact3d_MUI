@@ -204,6 +204,7 @@ contains
     use variables, only : numscalar,nu0nu
     use var, only : ta1, tb1
     use MPI
+    use variables, only :  MUI_COMM_WORLD
 
 
     IMPLICIT NONE

@@ -262,6 +262,7 @@ contains
       use MPI
       use param, only: dx,dy,dz,eps_factor,xnu,istret,xlx,yly,zlz
       use var, only: ux1, uy1, uz1, FTx, FTy, FTz, yp
+      use variables, only : MUI_COMM_WORLD
 
       implicit none
       real(mytype), allocatable, dimension(:,:,:) :: ux1_halo, uy1_halo, uz1_halo
