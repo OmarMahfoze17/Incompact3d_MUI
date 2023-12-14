@@ -1,4 +1,5 @@
 #!/bin/bash
 np_1=2
 np_2=2
-mpirun -np $np_1 -wdir ./Sender ../../../xcompact3d coupled : -np $np_2 -wdir ./Reciever ../../../xcompact3d coupled
+xcmp3dDir=/home/omar/WORK/codes/Incompact3d/xcompact3d
+mpirun -np $np_1 -wdir ./Sender $xcmp3dDir coupled : -np $np_2 -wdir ./Receiver $xcmp3dDir coupled

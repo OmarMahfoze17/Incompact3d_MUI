@@ -127,7 +127,7 @@ contains
 
        if((abs_prec(uxmax1)>=onehundred).or.(abs_prec(uymax1)>=onehundred).OR.(abs_prec(uzmax1)>=onehundred)) then
          write(*,*) 'Velocity diverged! SIMULATION IS STOPPED!'
-         call MPI_ABORT(MPI_COMM_WORLD,code,ierror)
+         call MPI_ABORT(MUI_COMM_WORLD,code,ierror)
          stop
        endif
 
@@ -450,7 +450,7 @@ contains
           write(*,*) '==========================================================='
           write(*,*) 'Error: Impossible to read '//trim(filestart)
           write(*,*) '==========================================================='
-          call MPI_ABORT(MPI_COMM_WORLD,code,ierror)
+          call MPI_ABORT(MUI_COMM_WORLD,code,ierror)
        endif
     endif
 

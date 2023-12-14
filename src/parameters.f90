@@ -81,7 +81,7 @@ subroutine parameter(input_i3d)
 #ifdef MUI_COUPLING
   NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection, &
    interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,tolerance,sendReceiveMode, &
-   sptlSmpType,tmpSmpType,rSampler,hSampler
+   sptlSmpType,tmpSmpType,rSpatialSamp,sigmaSpatialSamp,rTempSamp,sigmaTempSamp,nForget,tempMeanSampLower,tempMeanSampUpper
 #endif
 
 

@@ -154,10 +154,11 @@ groupVort(1,:) = 120, 120, 1, 129, 1, 32  ! Define box corners for group of poin
 dataOrgShft = 0, 0 ,0
 tolerance = 10e-7            ! tolerance needed when comparing equal values. Needed when exact spatial and temporal samplers are used. Default is 10e-37
 sendReceiveMode = 2          ! Define the order of the push and fetch operation. 1: receive first then send, 2: send first   
-sptlSmpType = 'linear'        ! Selection of the spatial sampler. Options: exact,linear, gauss, OTHERS TO BE ADDED
+sptlSmpType = 'exact'        ! Selection of the spatial sampler. Options: exact,linear, gauss, OTHERS TO BE ADDED
 tmpSmpType  = 'exact'	     ! Selection of the spatial sampler. Options: exact, OTHERS TO BE ADDED
-rSampler        = 0.05         ! Radius of the spatial interpolation. Default is 1
-hSampler        = 0.05         ! . Default is 1           
+rSpatialSamp        = 2         ! Radius of the spatial interpolation. Default is 1
+sigmaSpatialSamp        = 0.1         ! . Default is 1       
+nForget     = 5              ! number of time step in the past to be deleted after fech function is called    
 /End
 &CASE
 /End

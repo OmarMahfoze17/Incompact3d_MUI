@@ -61,14 +61,16 @@ contains
     ux1=zero;uy1=zero;uz1=zero
 
    !  a blasius profile is created in ecoule and then duplicated for the all domain
-    if (nclx1==2) then ! Use the orignial TBL inlet conditions 
-      call blasius()   
-    elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
-      call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location
-    else
-      print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
-      stop
-    endif
+    
+    call blasius()
+   !  if (nclx1==2) then ! Use the orignial TBL inlet conditions 
+   !    call blasius()   
+   !  elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
+   !    call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location
+   !  else
+   !    print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
+   !    stop
+   !  endif
 
     do k=1,xsize(3)
        do j=1,xsize(2)
@@ -207,6 +209,7 @@ contains
 #endif
     use decomp_2d_io
     use MPI
+    use variables, only : nForget
     
 
     implicit none
@@ -215,7 +218,7 @@ contains
     real(mytype),dimension(xsize(2),xsize(3)) :: bxx,bxy,bxz
 
     real(mytype) :: fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
-    integer :: i, j, k, is
+    integer :: i, j, k, reset_log=1
     grdSpce(1) = xlx/(nx-1)
     grdSpce(2) = yly/(ny-1)
     grdSpce(3) = zlz/(nz-1)
@@ -237,6 +240,12 @@ contains
       end do
    end do
 
+   
+   if ( iTime>=ifirst+nForget) then
+      if (nrank==0) write(*,*) "MUI: Forgeting log at time stamp of ", t-dt*nForget
+      call mui_forget_upper_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, &
+               real(t-dt*nForget,c_double),reset_log)
+   endif
    !  stop
 end subroutine recieveMUIBC
 
@@ -261,7 +270,6 @@ subroutine pushMUI(ux1, uy1, uz1)
       real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
       integer :: i, j, k, is,iGrp
       integer, allocatable,dimension(:,:) :: groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
-      groupNumb=1
       allocate(groupVortLocal(groupNumb,6))
       !!! DO NOT use dx,dy,dz used in the code as their values depends on the BC not the actual grid spacing.
       grdSpce(1) = xlx/(nx-1)
@@ -313,8 +321,11 @@ subroutine pushMUI(ux1, uy1, uz1)
                   point_y, point_z, uy1(i,j,k))
                   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uz"//c_null_char, point_x, &
                   point_y, point_z, uz1(i,j,k))               
-                  ! print *, "At ", point_x, point_y, point_z, "Xcompact 3d Pushed ux", ux1(i,j,k)
-
+                  
+                  ! if(trim(domainName)=='RightDomain') then
+                  !  print *, "From ",trim(domainName),' push at ', point_x, point_y, point_z
+                  ! stop
+                  ! endif
                enddo
             enddo
          enddo
@@ -333,6 +344,17 @@ subroutine MUI_create_sampler()
 #endif
       use decomp_2d_io
       use MPI
+      integer :: i
+   !! limit the pushing boxs dimensions to the domain size
+   do i=1,groupNumb  
+      groupVort(i,1) =max(groupVort(i,1),1)
+      groupVort(i,3) =max(groupVort(i,3),1)
+      groupVort(i,5) =max(groupVort(i,5),1)
+
+      groupVort(i,2) =min(groupVort(i,2),nx)
+      groupVort(i,4) =min(groupVort(i,4),ny)
+      groupVort(i,6) =min(groupVort(i,6),nz)
+   enddo
    !!! Set spatial sampler 
    if (trim(sptlSmpType)==trim('exact')) then
       call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
@@ -343,22 +365,22 @@ subroutine MUI_create_sampler()
          write(*,*)  "======================================================="
       endif
    else if (trim(sptlSmpType)==trim('linear')) then
-      call mui_create_sampler_pseudo_n2_linear_3d_f(spatial_sampler,rSampler)
+      call mui_create_sampler_pseudo_n2_linear_3d_f(spatial_sampler,rSpatialSamp)
       if (nrank==0) then
          write(*,*) "MUI spatial Sampler is created with: "
          write(*,*)  "     - Type      =   ", trim(sptlSmpType)
-         write(*,*)  "     - rSampler  = ", rSampler
-         write(*,*)  "     - hSampler  = ", hSampler
+         write(*,*)  "     - rSpatialSamp  = ", rSpatialSamp
+         write(*,*)  "     - sigmaSpatialSamp  = ", sigmaSpatialSamp
          write(*,*)  "     - Tolerance = ", tolerance
          write(*,*)  "======================================================="
       endif
    else if (trim(sptlSmpType)==trim('gauss')) then
-      call mui_create_sampler_gauss_3d_f(spatial_sampler,rSampler,hSampler)
+      call mui_create_sampler_gauss_3d_f(spatial_sampler,rSpatialSamp,sigmaSpatialSamp)
       if (nrank==0) then
          write(*,*) "MUI spatial Sampler is created with: "
          write(*,*)  "     - Type      =   ", trim(sptlSmpType)
-         write(*,*)  "     - rSampler  = ", rSampler
-         write(*,*)  "     - hSampler  = ", hSampler
+         write(*,*)  "     - rSpatialSamp  = ", rSpatialSamp
+         write(*,*)  "     - sigmaSpatialSamp  = ", sigmaSpatialSamp
          write(*,*)  "     - Tolerance = ", tolerance
          write(*,*)  "======================================================="
       endif
@@ -381,6 +403,18 @@ subroutine MUI_create_sampler()
    !!! Set Temporal sampler 
    if (trim(tmpSmpType)==trim('exact')) then
       call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
+   elseif (trim(tmpSmpType)==trim('gauss')) then
+      call mui_create_temporal_sampler_gauss_3d_f(temporal_sampler, rTempSamp,sigmaTempSamp)
+      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
+      write(*,*) " The Temporal Gauss sampler has not been tested for xcompact3D."
+      write(*,*) "  Do a proper testing before continue using it"
+      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
+   elseif (trim(tmpSmpType)==trim('mean')) then
+      call mui_create_temporal_sampler_mean_3d_f(temporal_sampler, tempMeanSampLower,tempMeanSampUpper)
+      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
+      write(*,*) " The Temporal Mean sampler has not been tested for xcompact3D."
+      write(*,*) "  Do a proper testing before continue using it"
+      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
    else
       if (nrank==0) then 
          write(*,*) "MUI Error: The temporal sampler ", tmpSmpType, "is not implemented"
@@ -395,6 +429,24 @@ subroutine MUI_create_sampler()
       mui_fetch => mui_fetch_gauss_exact_3d_f
    else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('exact')) then   
       mui_fetch => mui_fetch_pseudo_n2_linear_exact_3d_f
+
+
+   elseif (trim(sptlSmpType)==trim('exact') .and. trim(tmpSmpType)==trim('gauss') ) then
+      mui_fetch => mui_fetch_exact_gauss_3d_f
+   else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('gauss')) then
+      mui_fetch => mui_fetch_gauss_gauss_3d_f
+   else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('gauss')) then   
+      mui_fetch => mui_fetch_pseudo_n2_linear_gauss_3d_f
+
+   elseif (trim(sptlSmpType)==trim('exact') .and. trim(tmpSmpType)==trim('mean') ) then
+      mui_fetch => mui_fetch_exact_mean_3d_f
+   else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('mean')) then
+      mui_fetch => mui_fetch_gauss_mean_3d_f
+   else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('mean')) then   
+      mui_fetch => mui_fetch_pseudo_n2_linear_mean_3d_f
+
+
+
    else
       if (nrank==0) then 
          write(*,*) "The selected spatial and temporal sampler types have not impelemnted yet"

@@ -35,7 +35,7 @@ contains
 
     use MPI
     use param, only : ilmn, iscalar, ilast, ifirst, ioutput, istret
-    use variables, only : numscalar, prec, nvisu
+    use variables, only : numscalar, prec, nvisu,MUI_COMM_WORLD
     use param, only : dx, dy, dz
     use decomp_2d, only : nrank, mytype, xszV, yszV, zszV, xsize, ysize, zsize
     use decomp_2d_io, only : decomp_2d_init_io, decomp_2d_open_io, decomp_2d_append_mode
@@ -77,7 +77,7 @@ contains
     if (output2D < 0 .or. output2D > 3 &
         .or. (output2d == 2.and.istret /= 0)) then
       if (nrank.eq.0) write(*,*) "Visu module: incorrect value for output2D."
-      call MPI_ABORT(MPI_COMM_WORLD, 0, noutput)
+      call MPI_ABORT(MUI_COMM_WORLD, 0, noutput)
       stop
     endif
 

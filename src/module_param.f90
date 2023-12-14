@@ -53,7 +53,7 @@ module variables
   character(len=1024) :: domainName, interfaceName
   character(len=1024) :: sptlSmpType,tmpSmpType
   character(len=1024) :: arg_interface_count
-  integer(c_int) :: interface_count
+  integer(c_int) :: interface_count,nForget
   character(:), allocatable, target :: interfaces3d(:)
   character(:), allocatable :: domain3d
   integer :: interfaceDirection(200), interfaceLocation(200)
@@ -74,7 +74,9 @@ module variables
   integer :: MUIBC_ID(6),sendReceiveMode
 
   ! RBF filter varaibles
-  real(c_double) :: rSampler = 1_c_double,hSampler = 1.0_c_double
+  real(c_double) :: rSpatialSamp = 1.0_c_double,sigmaSpatialSamp = 1.0_c_double
+  real(c_double) :: rTempSamp = 1.0_c_double,sigmaTempSamp = 1.0_c_double
+  real(c_double) :: tempMeanSampLower,tempMeanSampUpper    !! used by the  temporal mean sampler 
 
   ABSTRACT INTERFACE
      SUBROUTINE MUI_FETCH_FUNS(uniface,attr,point_1,point_2,point_3,t,spatial_sampler, &
