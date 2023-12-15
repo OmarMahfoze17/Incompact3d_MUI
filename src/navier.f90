@@ -580,7 +580,7 @@ contains
           enddo
        enddo
     endif
-    if (nclxn==2 .or. nclxn==3) then
+    if (nclxn==2 ) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyxn(j,k)=dpdyxn(j,k)*gdt(itr)
@@ -595,6 +595,23 @@ contains
           enddo
        enddo
     endif
+
+    if (nclxn==3) then
+      do k=1,xsize(3)
+         do j=1,xsize(2)
+            dpdyxn(j,k)=dpdyxn(j,k)*gdt(itr)
+            dpdzxn(j,k)=dpdzxn(j,k)*gdt(itr)
+         enddo
+      enddo
+      do k=1,xsize(3)
+         do j=1,xsize(2)
+            ux(nx,j,k)=bxxn(j,k)
+            uy(nx,j,k)=bxyn(j,k)+dpdyxn(j,k)*0.0   !!! This might not be right, but it is done to avoid oscillation apearing at the coundary
+            uz(nx,j,k)=bxzn(j,k)+dpdzxn(j,k)*0.0   !!! This might not be right, but it is done to avoid oscillation apearing at the coundary
+         enddo
+      enddo
+   endif
+
 
 
     !********NCLX==1*************************************
