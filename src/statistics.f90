@@ -125,15 +125,23 @@ contains
 
   end subroutine restart_statistic
 
-  function gen_statname(stat) result(newname)
+  function gen_statname(stat,statTimeStamp) result(newname)
 
     implicit none
     
     character(len=*), intent(in) :: stat
     character(len=:), allocatable :: newname
+    integer :: statTimeStamp
     
 #ifndef ADIOS2
-    newname = stat//".dat"//int_to_str(stats_time)
+    if (statTimeStamp==0) then
+      newname = stat//".dat"
+    elseif (statTimeStamp==1) then 
+      newname = stat//".dat"//int_to_str(stats_time)
+    else 
+      write(*,*) "Error: Worng selection of `statTimeStamp`. it takes 0 or 1"
+      stop  
+    endif
 #else
     newname = stat
 #endif
@@ -146,7 +154,7 @@ contains
   subroutine read_or_write_all_stats(flag_read)
 
     use param, only : iscalar, itime
-    use variables, only : numscalar
+    use variables, only : numscalar,statTimeStamp
     use decomp_2d, only : nrank
     use decomp_2d_io, only : decomp_2d_write_mode, decomp_2d_read_mode, &
          decomp_2d_open_io, decomp_2d_close_io, decomp_2d_start_io, decomp_2d_end_io
@@ -197,25 +205,25 @@ contains
     call decomp_2d_start_io(io_statistics, stat_dir)
 #endif
     
-    call read_or_write_one_stat(flag_read, gen_statname("pmean"), pmean)
-    call read_or_write_one_stat(flag_read, gen_statname("umean"), umean)
-    call read_or_write_one_stat(flag_read, gen_statname("vmean"), vmean)
-    call read_or_write_one_stat(flag_read, gen_statname("wmean"), wmean)
+    call read_or_write_one_stat(flag_read, gen_statname("pmean",statTimeStamp), pmean)
+    call read_or_write_one_stat(flag_read, gen_statname("umean",statTimeStamp), umean)
+    call read_or_write_one_stat(flag_read, gen_statname("vmean",statTimeStamp), vmean)
+    call read_or_write_one_stat(flag_read, gen_statname("wmean",statTimeStamp), wmean)
 
-    call read_or_write_one_stat(flag_read, gen_statname("uumean"), uumean)
-    call read_or_write_one_stat(flag_read, gen_statname("vvmean"), vvmean)
-    call read_or_write_one_stat(flag_read, gen_statname("wwmean"), wwmean)
+    call read_or_write_one_stat(flag_read, gen_statname("uumean",statTimeStamp), uumean)
+    call read_or_write_one_stat(flag_read, gen_statname("vvmean",statTimeStamp), vvmean)
+    call read_or_write_one_stat(flag_read, gen_statname("wwmean",statTimeStamp), wwmean)
 
-    call read_or_write_one_stat(flag_read, gen_statname("uvmean"), uvmean)
-    call read_or_write_one_stat(flag_read, gen_statname("uwmean"), uwmean)
-    call read_or_write_one_stat(flag_read, gen_statname("vwmean"), vwmean)
+    call read_or_write_one_stat(flag_read, gen_statname("uvmean",statTimeStamp), uvmean)
+    call read_or_write_one_stat(flag_read, gen_statname("uwmean",statTimeStamp), uwmean)
+    call read_or_write_one_stat(flag_read, gen_statname("vwmean",statTimeStamp), vwmean)
 
     if (iscalar==1) then
        do is=1, numscalar
           write(filename,"('phi',I2.2)") is
-          call read_or_write_one_stat(flag_read, gen_statname(trim(filename)), phimean(:,:,:,is))
+          call read_or_write_one_stat(flag_read, gen_statname(trim(filename),statTimeStamp), phimean(:,:,:,is))
           write(filename,"('phiphi',I2.2)") is
-          call read_or_write_one_stat(flag_read, gen_statname(trim(filename)), phiphimean(:,:,:,is))
+          call read_or_write_one_stat(flag_read, gen_statname(trim(filename),statTimeStamp), phiphimean(:,:,:,is))
        enddo
     endif
 

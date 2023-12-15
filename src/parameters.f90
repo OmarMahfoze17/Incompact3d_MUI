@@ -59,7 +59,7 @@ subroutine parameter(input_i3d)
   NAMELIST /InOutParam/ irestart, icheckpoint, ioutput, nvisu, ilist, iprocessing, &
        ninflows, ntimesteps, inflowpath, ioutflow, output2D, nprobes, &
        validation_restart
-  NAMELIST /Statistics/ wrotation,spinup_time, nstat, initstat, istatfreq
+  NAMELIST /Statistics/ wrotation,spinup_time, nstat, initstat, istatfreq,statTimeStamp
   NAMELIST /ProbesParam/ flag_all_digits, flag_extra_probes, xyzprobes
   NAMELIST /ScalarParam/ sc, ri, uset, cp, &
        nclxS1, nclxSn, nclyS1, nclySn, nclzS1, nclzSn, &
