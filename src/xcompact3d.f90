@@ -20,7 +20,7 @@ program xcompact3d
 
   implicit none
 
-
+  write(*,*) ".... xcompact3d started ...."
   call init_xcompact3d()
 
   do itime=ifirst,ilast
