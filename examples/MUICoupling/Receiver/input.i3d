@@ -137,29 +137,6 @@ A_tr = 0.356625       !to be use with care, value is mesh-dependent
 !x0_tr_tbl=3.505082
 
 /End
-!================
-&MUICoupling
-!================
 
-domainName = 'RightDomain'   
-interfaceName = 'interface'
-interface_count = 1      
-interfaceDirection = 1, 1     ! This is an array to define the direction of all interfaces(1: normal to x-dir, 2: normal to x-dir, 3: normal to x-dir). 
-interfaceLocation  = 1, 120   ! This is an array to define the location of all interfaces. 
-MUIBC_ID = 1, 1, 1, 1, 1, 1   ! Associate an interface indentfied by MUIBC_ID to the boundary condition. 
-                              !i.e. MUIBC_ID(1) coresponds to the BC of x=0, MUIBC_ID(2) => BC at x=xlx, MUIBC_ID(3) => BC at y=0 , MUIBC_ID(4) =>  BC at y=yly
-                              !MUIBC_ID(5) => BC at z=0, MUIBC_ID(2) => BC at z=zlz
-groupNumb = 1
-groupVort(1,:) = 39, 39, 1, 129, 1, 8  ! Define box corners for group of points to be pushed
-dataOrgShft = 231.4453125, 0 ,0
-tolerance = 10e-7            ! tolerance needed when comparing equal values. Needed when exact spatial and temporal samplers are used. Default is 10e-37
-sendReceiveMode = 1          ! Define the order of the push and fetch operation. 1: receive first then send, 2: send first
-sptlSmpType = 'exact'        ! Selection of the spatial sampler. Options: exact,linear, gauss, OTHERS TO BE ADDED
-tmpSmpType  = 'exact'	     ! Selection of the spatial sampler. Options: exact, OTHERS TO BE ADDED
-rSpatialSamp        = 2         ! Radius of the spatial interpolation. Default is 1
-sigmaSpatialSamp        = 0.1         ! . Default is 1       
-nForget     = 5              ! number of time step in the past to be deleted after fech function is called    
-
-/End
 &CASE
 /End

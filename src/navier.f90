@@ -534,7 +534,8 @@ contains
 
     !********NCLX==2*************************************
     !we are in X pencils:
-    if ((itype.eq.itype_channel.or.itype.eq.itype_uniform.or.itype.eq.itype_abl).and.((nclx1==2 .or. nclx1.eq.3).and.(nclxn==2 .or. nclxn.eq.3))) then
+    if ((itype.eq.itype_channel.or.itype.eq.itype_uniform.or.itype.eq.itype_abl.or.itype.eq.itype_wrf).and. &
+        ((nclx1==2 .or. nclx1.eq.3).and.(nclxn==2 .or. nclxn.eq.3))) then
 
        !Computation of the flow rate Inflow/Outflow
        ut1=zero
@@ -563,7 +564,7 @@ contains
 
     endif
 
-    if (itype.eq.itype_tbl .or. itype.eq.itype_MUIBC ) call tbl_flrt(ux,uy,uz)
+    if (itype.eq.itype_tbl .or. itype.eq.itype_MUIBC .or. itype.eq.itype_WRF) call tbl_flrt(ux,uy,uz)
 
     if (nclx1==2 .or. nclx1==3) then
        do k=1,xsize(3)

@@ -16,11 +16,13 @@ program xcompact3d
   use ibm_param
   use ibm, only : body
   use genepsi, only : genepsi3d
-  use MUIcoupledBC, only : pushMUI, MUI_create_sampler
+  use MUIcoupledBC, only : pushMUI
+  
 
   implicit none
 
-  write(*,*) ".... xcompact3d started ...."
+  real :: tstartMUI,tendMUI,timeMUI_1
+
   call init_xcompact3d()
 
   do itime=ifirst,ilast
@@ -45,19 +47,27 @@ program xcompact3d
 #ifdef MUI_COUPLING
       ! Set the order of the coupling operations
       if (trim(MUIcommandArgs).eq.trim('coupled')) then
-        if (sendReceiveMode==1) then ! Receive first 
+         call cpu_time(tstartMUI)
+         if (sendReceiveMode==0) then ! No Sending 
+            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+        else if (sendReceiveMode==1) then ! Receive first 
             call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
             call pushMUI(ux1, uy1, uz1)
         else if (sendReceiveMode==2) then  ! push first 
             call pushMUI(ux1, uy1, uz1)
-            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)            
+            call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
         else 
             write(*,*) "Wrong selction of sendReceiveMode to ", sendReceiveMode
             stop
         endif
+        call cpu_time(tendMUI)
+        timeMUI_1=tendMUI-tstartMUI
+        if (nrank==0) print *, trim(domainName)," : MUI comunication time in Domain  is : ", timeMUI_1, " seconds"
       else
          call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
       endif
+#else
+      call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
 #endif
         if (imove.eq.1) then ! update epsi for moving objects
           if ((iibm.eq.2).or.(iibm.eq.3)) then
@@ -152,7 +162,7 @@ use mpi_f08 , only : MPI_comm
 
   use probes, only : init_probes
 #ifdef MUI_COUPLING
-  use MUIcoupledBC, only : pushMUI, MUI_create_sampler
+  use MUIcoupling
 #endif
   implicit none
 
@@ -169,6 +179,7 @@ use mpi_f08 , only : MPI_comm
    call mui_mpi_split_by_app_f(MUI_COMM_WORLD)
 #else
   call MPI_INIT(ierr)
+  MUI_COMM_WORLD = MPI_COMM_WORLD
 #endif
   call MPI_COMM_RANK(MUI_COMM_WORLD,nrank,ierr) 
   call MPI_COMM_SIZE(MUI_COMM_WORLD,nproc,ierr)
@@ -208,8 +219,9 @@ use mpi_f08 , only : MPI_comm
 #endif
   
   call parameter(InputFN)
+
 #ifdef MUI_COUPLING
-if (trim(MUIcommandArgs).eq.trim('coupled')) call MUI_create_sampler()
+  if (trim(MUIcommandArgs).eq.trim('coupled')) call MUI_init ()
 #endif
 
   call decomp_2d_init(nx,ny,nz,p_row,p_col,MUI_COMM_WORLD)

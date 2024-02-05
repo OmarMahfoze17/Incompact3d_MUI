@@ -17,7 +17,7 @@ module MUIcoupledBC
 
   PRIVATE ! All functions/subroutines private by default
   PUBLIC :: init_MUIBC, boundary_conditions_MUIBC, postprocess_MUIBC, &
-  visu_MUIBC, visu_MUIBC_init, pushMUI, MUI_create_sampler
+  visu_MUIBC, visu_MUIBC_init, pushMUI
 
 contains
 
@@ -105,13 +105,10 @@ contains
     integer :: i, j, k, is
       
     !INFLOW with an update of bxx1, byy1 and bzz1 at the inlet
-    if (nclx1==2) then ! Use the orignial TBL inlet conditions       
-      call blasius()
-    elseif (nclx1==3) then ! Use the orignial get inlet conditions from MUI interface 
+    if (nclxCPL1==1) then ! Use the orignial get inlet conditions from MUI interface 
       call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location 
     else
-      print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
-      stop
+      call blasius()
     endif
     
    !  
@@ -265,8 +262,8 @@ subroutine pushMUI(ux1, uy1, uz1)
 
       implicit none
       real(mytype), dimension(xsize(1), xsize(2), xsize(3)), intent(in) :: ux1, uy1, uz1
-      real(mytype) :: delta_int, delta_eta, eps_eta
-
+      real(mytype) :: delta_int, delta_eta, eps_eta,TempValue
+      real(mytype) :: sndTime1,sndTime2
       real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
       integer :: i, j, k, is,iGrp
       integer, allocatable,dimension(:,:) :: groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
@@ -306,6 +303,7 @@ subroutine pushMUI(ux1, uy1, uz1)
 
       ! stop 
       !/ Push data to MUI interface 
+      call cpu_time(sndTime1)
       do iGrp = 1, groupNumb
          do k=groupVortLocal(iGrp,5),groupVortLocal(iGrp,6)
             do j=groupVortLocal(iGrp,3),groupVortLocal(iGrp,4)
@@ -329,133 +327,27 @@ subroutine pushMUI(ux1, uy1, uz1)
                enddo
             enddo
          enddo
-         call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
+         
       enddo
+      call cpu_time(sndTime2)
+      if (nrank==0) print *, "MUI: Sending CPU time ", sndTime2-sndTime1
+      if (nrank ==0 )  write(*,*) "Sending at ", T
+
+      if (sendReceiveMode==2) then 
+         call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T+dt)  !! this allows for synchronise runs where the other domain does not wait. 
+      else 
+         call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
+      endif
+
+      
+
+      
+      if (iSync ==1 ) call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "tempvalue"//c_null_char, 0.0_mytype,0.0_mytype, &
+      0.0_mytype, T-dt*nSyncAhead , spatial_sampler, temporal_sampler, TempValue)
+      
 
       
 end subroutine pushMUI
-
-subroutine MUI_create_sampler()
-#ifdef MUI_COUPLING
-   ! Coupling varaibles 
-      use iso_c_binding
-      use mui_3d_f
-      use mui_general_f
-#endif
-      use decomp_2d_io
-      use MPI
-      integer :: i
-   !! limit the pushing boxs dimensions to the domain size
-   do i=1,groupNumb  
-      groupVort(i,1) =max(groupVort(i,1),1)
-      groupVort(i,3) =max(groupVort(i,3),1)
-      groupVort(i,5) =max(groupVort(i,5),1)
-
-      groupVort(i,2) =min(groupVort(i,2),nx)
-      groupVort(i,4) =min(groupVort(i,4),ny)
-      groupVort(i,6) =min(groupVort(i,6),nz)
-   enddo
-   !!! Set spatial sampler 
-   if (trim(sptlSmpType)==trim('exact')) then
-      call mui_create_sampler_exact_3d_f(spatial_sampler, tolerance)
-      if (nrank==0) then
-         write(*,*) "MUI spatial Sampler is created with: "
-         write(*,*)  "     - Type      =", trim(sptlSmpType)
-         write(*,*)  "     - Tolerance =", tolerance
-         write(*,*)  "======================================================="
-      endif
-   else if (trim(sptlSmpType)==trim('linear')) then
-      call mui_create_sampler_pseudo_n2_linear_3d_f(spatial_sampler,rSpatialSamp)
-      if (nrank==0) then
-         write(*,*) "MUI spatial Sampler is created with: "
-         write(*,*)  "     - Type      =   ", trim(sptlSmpType)
-         write(*,*)  "     - rSpatialSamp  = ", rSpatialSamp
-         write(*,*)  "     - sigmaSpatialSamp  = ", sigmaSpatialSamp
-         write(*,*)  "     - Tolerance = ", tolerance
-         write(*,*)  "======================================================="
-      endif
-   else if (trim(sptlSmpType)==trim('gauss')) then
-      call mui_create_sampler_gauss_3d_f(spatial_sampler,rSpatialSamp,sigmaSpatialSamp)
-      if (nrank==0) then
-         write(*,*) "MUI spatial Sampler is created with: "
-         write(*,*)  "     - Type      =   ", trim(sptlSmpType)
-         write(*,*)  "     - rSpatialSamp  = ", rSpatialSamp
-         write(*,*)  "     - sigmaSpatialSamp  = ", sigmaSpatialSamp
-         write(*,*)  "     - Tolerance = ", tolerance
-         write(*,*)  "======================================================="
-      endif
-   else if (trim(sptlSmpType)==trim('RBF')) then
-      !! to be added 
-      if (nrank==0) then 
-         Write(*,*) trim(sptlSmpType), "To be added"
-         write(*,*) "The available spatial samplers are exact, RBF"
-      endif
-      stop
-   else
-      if (nrank==0) then 
-         Write(*,*) trim(sptlSmpType), "is wrong option for MUI spatial Sampler"
-         write(*,*) "The available spatial samplers are exact, RBF"
-         write(*,*)  "======================================================="
-      endif
-      stop
-   endif
-
-   !!! Set Temporal sampler 
-   if (trim(tmpSmpType)==trim('exact')) then
-      call mui_create_temporal_sampler_exact_3d_f(temporal_sampler, tolerance)
-   elseif (trim(tmpSmpType)==trim('gauss')) then
-      call mui_create_temporal_sampler_gauss_3d_f(temporal_sampler, rTempSamp,sigmaTempSamp)
-      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
-      write(*,*) " The Temporal Gauss sampler has not been tested for xcompact3D."
-      write(*,*) "  Do a proper testing before continue using it"
-      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
-   elseif (trim(tmpSmpType)==trim('mean')) then
-      call mui_create_temporal_sampler_mean_3d_f(temporal_sampler, tempMeanSampLower,tempMeanSampUpper)
-      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
-      write(*,*) " The Temporal Mean sampler has not been tested for xcompact3D."
-      write(*,*) "  Do a proper testing before continue using it"
-      write(*,*) " XXXXXXXXXXXXXXXXXXXXX Warning XXXXXXXXXXXXXXXXXXXXX "
-   else
-      if (nrank==0) then 
-         write(*,*) "MUI Error: The temporal sampler ", tmpSmpType, "is not implemented"
-      endif
-      stop
-   endif
-
-   ! Set the fetch function 
-   if (trim(sptlSmpType)==trim('exact') .and. trim(tmpSmpType)==trim('exact') ) then
-      mui_fetch => mui_fetch_exact_exact_3d_f
-   else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('exact')) then
-      mui_fetch => mui_fetch_gauss_exact_3d_f
-   else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('exact')) then   
-      mui_fetch => mui_fetch_pseudo_n2_linear_exact_3d_f
-
-
-   elseif (trim(sptlSmpType)==trim('exact') .and. trim(tmpSmpType)==trim('gauss') ) then
-      mui_fetch => mui_fetch_exact_gauss_3d_f
-   else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('gauss')) then
-      mui_fetch => mui_fetch_gauss_gauss_3d_f
-   else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('gauss')) then   
-      mui_fetch => mui_fetch_pseudo_n2_linear_gauss_3d_f
-
-   elseif (trim(sptlSmpType)==trim('exact') .and. trim(tmpSmpType)==trim('mean') ) then
-      mui_fetch => mui_fetch_exact_mean_3d_f
-   else if (trim(sptlSmpType)==trim('gauss') .and. trim(tmpSmpType)==trim('mean')) then
-      mui_fetch => mui_fetch_gauss_mean_3d_f
-   else if (trim(sptlSmpType)==trim('linear') .and. trim(tmpSmpType)==trim('mean')) then   
-      mui_fetch => mui_fetch_pseudo_n2_linear_mean_3d_f
-
-
-
-   else
-      if (nrank==0) then 
-         write(*,*) "The selected spatial and temporal sampler types have not impelemnted yet"
-      endif
-      stop
-   endif
-
-end subroutine MUI_create_sampler
-
 
   !############################################################################
   subroutine postprocess_MUIBC(ux1,uy1,uz1,ep1)

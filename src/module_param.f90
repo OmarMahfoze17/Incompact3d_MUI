@@ -53,7 +53,7 @@ module variables
   character(len=1024) :: domainName, interfaceName
   character(len=1024) :: sptlSmpType,tmpSmpType
   character(len=1024) :: arg_interface_count
-  integer(c_int) :: interface_count,nForget
+  integer(c_int) :: interface_count,nForget,nSyncAhead=0,iSync=1
   character(:), allocatable, target :: interfaces3d(:)
   character(:), allocatable :: domain3d
   integer :: interfaceDirection(200), interfaceLocation(200)
@@ -68,10 +68,12 @@ module variables
   type(c_ptr), target :: spatial_sampler=c_null_ptr
   type(c_ptr), target :: temporal_sampler=c_null_ptr
   real(c_double) :: tolerance=1e-37_c_double
+  real(c_double) :: spatialScale = 1.0_c_double,timeScale = 1.0_c_double
   ! integer(c_int) :: MUI_COMM_WORLD
   
   integer :: MUI_x1_ID,MUI_xn_ID,MUI_y1_ID,MUI_yn_ID,MUI_z1_ID,MUI_zn_ID   
   integer :: MUIBC_ID(6),sendReceiveMode
+  Integer :: nclxCPL1,nclxCPLn,nclyCPL1,nclyCPLn,nclzCPL1,nclzCPLn
 
   ! RBF filter varaibles
   real(c_double) :: rSpatialSamp = 1.0_c_double,sigmaSpatialSamp = 1.0_c_double
@@ -341,7 +343,8 @@ module param
        itype_sandbox = 12, &
        itype_cavity = 13, &
        itype_pipe = 14, &
-       itype_MUIBC = 15
+       itype_MUIBC = 15, &
+       itype_WRF = 16
 
   integer :: cont_phi,itr,itime,itest,iprocessing
   integer :: ifft,istret,iforc_entree,iturb

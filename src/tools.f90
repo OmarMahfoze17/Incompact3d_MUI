@@ -125,7 +125,7 @@ contains
        write(*,*) 'U,V,W max=',real(uxmax1,4),real(uymax1,4),real(uzmax1,4)
        !print *,'CFL=',real(abs(max(uxmax1,uymax1,uzmax1)*dt)/min(dx,dy,dz),4)
 
-       if((abs_prec(uxmax1)>=onehundred).or.(abs_prec(uymax1)>=onehundred).OR.(abs_prec(uzmax1)>=onehundred)) then
+       if((abs_prec(uxmax1)>=onehundred*100.0).or.(abs_prec(uymax1)>=onehundred*100.0).OR.(abs_prec(uzmax1)>=onehundred*100.0)) then
          write(*,*) 'Velocity diverged! SIMULATION IS STOPPED!'
          call MPI_ABORT(MUI_COMM_WORLD,code,ierror)
          stop

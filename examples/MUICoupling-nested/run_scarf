@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH  -J motorBike
+#SBATCH -p scarf
+#SBATCH -C scarf2122
+#SBATCH -n 64
+
+##SBATCH --tasks-per-node=16
+#SBATCH -t 00:10:00
+#SBATCH -o %J.log
+#SBATCH -e %J.err
+
+cd $SLURM_SUBMIT_DIR
+source ~/.bashrc
+np_1=32
+np_2=32
+export xcmpct3dDir='/work4/scd/scarf1068/run/UKTC/codes/Incompact3d'
+
+mpirun -np $np_1 -wdir ./Sender ${xcmpct3dDir}/xcompact3d coupled : -np $np_2 -wdir ./Reciever ${xcmpct3dDir}/xcompact3d coupled > LOG 
+
+#sbatch run

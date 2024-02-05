@@ -18,6 +18,7 @@ module case
   use lockexch
   use tbl
   use MUIcoupledBC
+  use MUIcoupledBC_WRF
   use abl
   use uniform
   use sandbox
@@ -104,6 +105,9 @@ contains
     elseif (itype.eq.itype_MUIBC) then
 
        call init_MUIBC (ux1, uy1, uz1, ep1, phi1)
+    elseif (itype.eq.itype_WRF) then
+
+       call init_WRF (ux1, uy1, uz1, ep1, phi1)
 
     elseif (itype.eq.itype_abl) then
 
@@ -217,12 +221,14 @@ contains
 
        call boundary_conditions_pipe (ux, uy, uz, phi)
 #ifdef MUI_COUPLING
-   elseif (itype.eq.itype_MUIBC) then
+    elseif (itype.eq.itype_MUIBC) then
 
       call boundary_conditions_MUIBC (ux, uy, uz, phi)
+    elseif (itype.eq.itype_WRF) then
+      call boundary_conditions_WRF (ux, uy, uz, phi)
 #endif
     else
-         print *, "boundary_conditions error"
+         print *, "boundary_conditions error: check the case type itype"
 
     endif
 
@@ -372,6 +378,9 @@ contains
     elseif (itype.eq.itype_MUIBC) then
 
       call postprocess_MUIBC (ux, uy, uz, ep)
+    elseif (itype.eq.itype_WRF) then
+
+      call postprocess_WRF (ux, uy, uz, ep)
 
     elseif (itype.eq.itype_abl) then
 
@@ -434,6 +443,9 @@ contains
     else if (itype .eq. itype_MUIBC) then
 
       call visu_MUIBC_init(case_visu_init)
+   else if (itype .eq. itype_WRF) then
+
+      call visu_WRF_init(case_visu_init)
 
     else if (itype .eq. itype_lockexch) then
 
@@ -500,6 +512,10 @@ contains
     elseif (itype.eq.itype_MUIBC) then
 
       call visu_MUIBC(ux1, uy1, uz1, pp3, phi1, ep1, num)
+      called_visu = .true.
+    elseif (itype.eq.itype_WRF) then
+
+      call visu_WRF(ux1, uy1, uz1, pp3, phi1, ep1, num)
       called_visu = .true.
        
     elseif (itype.eq.itype_uniform) then

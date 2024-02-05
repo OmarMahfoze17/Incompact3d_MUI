@@ -112,38 +112,6 @@ subroutine parameter(input_i3d)
 
   !! These are the 'essential' parameters
   read(10, nml=BasicParam); rewind(10)
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#ifdef MUI_COUPLING
-   if (trim(MUIcommandArgs).eq.trim('coupled')) then 
-      read(10, nml=MUICoupling); rewind(10)  
-      allocate(character(len_trim(interfaceName)+5) :: interfaces3d(interface_count))
-      !For multi-domain function, "uniface_pointers_1d" should be used to collect the array of
-      ! MUI uniface pointers. It is decleared in the MUI FORTRAN wrapper.
-      allocate(uniface_pointers_3d(interface_count),ifsDir(interface_count),ifsLoc(interface_count))
-
-      do ifsIndx = 1, interface_count
-         !Generate character type of number suffix
-         if (ifsIndx < 10) then
-            write (numberSuffix, "(I1)") ifsIndx
-         else if ((ifsIndx < 100) .and. (ifsIndx > 9)) then
-            write (numberSuffix, "(I2)") ifsIndx
-         else if ((ifsIndx < 1000) .and. (ifsIndx > 99)) then
-            write (numberSuffix, "(I3)") ifsIndx
-         else
-            write (numberSuffix, "(I4)") ifsIndx
-         endif
-
-         !Create and collect interface names
-         interfaces3d(ifsIndx) = trim(interfaceName) // "_" // trim(numberSuffix)
-         ifsDir(ifsIndx)=interfaceDirection(ifsIndx)
-         ifsLoc(ifsIndx)=interfaceLocation(ifsIndx)
-      end do 
-      call create_and_get_uniface_multi_3d_f(uniface_pointers_3d, trim(domainName), interfaces3d, interface_count)
-   endif
-#endif
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
   if (nz==1) then
      if (nrank==0) write(*,*) "Warning : support for 2D simulations is experimental"
@@ -400,6 +368,8 @@ subroutine parameter(input_i3d)
         print *,'Cavity'  
      elseif (itype.eq.itype_MUIBC) then
          print *,'MUI coupled boundary condition'
+     elseif (itype.eq.itype_WRF) then
+            print *,'Coupling with WRF'
      else
         print *,'Unknown itype: ', itype
         stop
@@ -609,7 +579,7 @@ subroutine parameter(input_i3d)
          write(*,*) '==========================================================='
          write(*,*) 'Error: Using a coupled boundary Conditions, but Coupling is not activated'
          write(*,*) ' Activate the coupling mode by adding the argument `coupled` to run command '
-         write(*,*) ' i.e. ./xcompact3d couled '
+         write(*,*) ' i.e. ./xcompact3d coupled '
          write(*,*) '==========================================================='
       endif
       stop
