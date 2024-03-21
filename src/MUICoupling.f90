@@ -36,7 +36,8 @@ contains
     NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection, &
    interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,spatialScale,timeScale,tolerance,sendReceiveMode, &
    sptlSmpType,tmpSmpType,rSpatialSamp,sigmaSpatialSamp,rTempSamp,sigmaTempSamp,iSync,nSyncAhead,nForget,tempMeanSampLower,tempMeanSampUpper
-    NAMELIST/MUICouplingBC/nclxCPL1,nclxCPLn,nclyCPL1,nclyCPLn,nclzCPL1,nclzCPLn
+    NAMELIST/MUICouplingBC/nclxCPL1,nclxCPLn,nclyCPL1,nclyCPLn,nclzCPL1,nclzCPLn, &
+                           nclxCrr1,nclxCrrn,nclyCrr1,nclyCrrn,nclzCrr1,nclzCrrn
 
     if (trim(MUIcommandArgs).eq.trim('coupled')) then
       open(10, file="./input.mui") 

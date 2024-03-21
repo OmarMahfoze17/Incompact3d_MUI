@@ -436,7 +436,7 @@ contains
     endif
 
     !we are in X pencils:
-    if (nclx1.eq.2 .or. nclx1.eq.3) then
+    if (nclx1.eq.2) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyx1(j,k)=py1(1,j,k)/gdt(itr)
@@ -444,7 +444,7 @@ contains
           enddo
        enddo
     endif
-    if (nclxn.eq.2 .or. nclxn.eq.3) then
+    if (nclxn.eq.2) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyxn(j,k)=py1(nx,j,k)/gdt(itr)
@@ -534,8 +534,8 @@ contains
 
     !********NCLX==2*************************************
     !we are in X pencils:
-    if ((itype.eq.itype_channel.or.itype.eq.itype_uniform.or.itype.eq.itype_abl.or.itype.eq.itype_wrf).and. &
-        ((nclx1==2 .or. nclx1.eq.3).and.(nclxn==2 .or. nclxn.eq.3))) then
+    if ((itype.eq.itype_channel.or.itype.eq.itype_uniform.or.itype.eq.itype_abl).and. &
+        (nclx1==2.and.nclxn==2)) then
 
        !Computation of the flow rate Inflow/Outflow
        ut1=zero
@@ -564,9 +564,9 @@ contains
 
     endif
 
-    if (itype.eq.itype_tbl .or. itype.eq.itype_MUIBC .or. itype.eq.itype_WRF) call tbl_flrt(ux,uy,uz)
+    if (itype.eq.itype_tbl .or. itype.eq.itype_MUIBC) call tbl_flrt(ux,uy,uz)
 
-    if (nclx1==2 .or. nclx1==3) then
+    if (nclx1==2) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyx1(j,k)=dpdyx1(j,k)*gdt(itr)
@@ -581,7 +581,7 @@ contains
           enddo
        enddo
     endif
-    if (nclxn==2 ) then
+    if (nclxn==2) then
        do k=1,xsize(3)
           do j=1,xsize(2)
              dpdyxn(j,k)=dpdyxn(j,k)*gdt(itr)
@@ -596,23 +596,6 @@ contains
           enddo
        enddo
     endif
-
-    if (nclxn==3) then
-      do k=1,xsize(3)
-         do j=1,xsize(2)
-            dpdyxn(j,k)=dpdyxn(j,k)*gdt(itr)
-            dpdzxn(j,k)=dpdzxn(j,k)*gdt(itr)
-         enddo
-      enddo
-      do k=1,xsize(3)
-         do j=1,xsize(2)
-            ux(nx,j,k)=bxxn(j,k)
-            uy(nx,j,k)=bxyn(j,k)+dpdyxn(j,k)*0.0   !!! This might not be right, but it is done to avoid oscillation apearing at the coundary
-            uz(nx,j,k)=bxzn(j,k)+dpdzxn(j,k)*0.0   !!! This might not be right, but it is done to avoid oscillation apearing at the coundary
-         enddo
-      enddo
-   endif
-
 
 
     !********NCLX==1*************************************
@@ -1294,7 +1277,7 @@ contains
     !! velocity correction
     udif=(utt1-utt2+utt3-utt4)/yly
     if ((nrank==0).and.(mod(itime,ilist)==0)) then
-      write(*,"(' Mass balance: L-BC, R-BC,',2f12.6)") utt1,utt2
+      write(*,"(' Mass balance: L-BC, R-BC,',2f18.9)") utt1,utt2
       write(*,"(' Mass balance: B-BC, T-BC, Crr-Vel',3f11.5)") utt3,utt4,udif
     endif
     ! do k=1,xsize(3)

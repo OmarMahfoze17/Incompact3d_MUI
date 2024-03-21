@@ -91,6 +91,10 @@ contains
     
     integer :: i,j,k,is
 
+#ifdef DEBG 
+    real(mytype) :: dep, dep1
+    integer :: code
+#endif
 
     !SKEW SYMMETRIC FORM
     !WORK X-PENCILS
@@ -104,6 +108,11 @@ contains
       tc1(:,:,:) = ux1(:,:,:) * uz1(:,:,:)
     endif
 
+#ifdef DEBG
+    dep=maxval(abs(ta1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR ta1 (uu) MAX ', dep1
+#endif
 
     call derx (td1,ta1,di1,sx,ffxp,fsxp,fwxp,xsize(1),xsize(2),xsize(3),1,ubcx*ubcx)
     call derx (te1,tb1,di1,sx,ffx,fsx,fwx,xsize(1),xsize(2),xsize(3),0,ubcx*ubcy)
@@ -111,6 +120,12 @@ contains
     call derx (ta1,ux1,di1,sx,ffx,fsx,fwx,xsize(1),xsize(2),xsize(3),0,ubcx)
     call derx (tb1,uy1,di1,sx,ffxp,fsxp,fwxp,xsize(1),xsize(2),xsize(3),1,ubcy)
     call derx (tc1,uz1,di1,sx,ffxp,fsxp,fwxp,xsize(1),xsize(2),xsize(3),1,ubcz)
+
+#ifdef DEBG
+    dep=maxval(abs(ta1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR ta1 (du) MAX ', dep1
+#endif
 
     ! Convective terms of x-pencil are stored in tg1,th1,ti1
     if (ilmn) then
@@ -123,7 +138,11 @@ contains
       ti1(:,:,:) = tf1(:,:,:) + ux1(:,:,:) * tc1(:,:,:)
     endif
     ! TODO: save the x-convective terms already in dux1, duy1, duz1
-
+#ifdef DEBG
+    dep=maxval(abs(tg1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR tg1 (duu+udu) MAX ', dep1
+#endif
 
     if (ilmn) then
        !! Quasi-skew symmetric terms
@@ -136,7 +155,14 @@ contains
     call transpose_x_to_y(ux1,ux2)
     call transpose_x_to_y(uy1,uy2)
     call transpose_x_to_y(uz1,uz2)
-
+#ifdef DEBG
+    dep=maxval(abs(ux2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR ux2 (transpose) MAX ', dep1
+    dep=maxval(abs(uy2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR uy2 (transpose) MAX ', dep1
+#endif
 
     if (ilmn) then
        call transpose_x_to_y(rho1(:,:,:,1),rho2)
@@ -155,7 +181,11 @@ contains
       te2(:,:,:) = uy2(:,:,:) * uy2(:,:,:)
       tf2(:,:,:) = uz2(:,:,:) * uy2(:,:,:)
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(td2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR td2 (uu) MAX ', dep1
+#endif
 
     call dery (tg2,td2,di2,sy,ffy,fsy,fwy,ppy,ysize(1),ysize(2),ysize(3),0,ubcx*ubcy)
     call dery (th2,te2,di2,sy,ffyp,fsyp,fwyp,ppy,ysize(1),ysize(2),ysize(3),1,ubcy*ubcy)
@@ -164,7 +194,11 @@ contains
     call dery (te2,uy2,di2,sy,ffy,fsy,fwy,ppy,ysize(1),ysize(2),ysize(3),0,ubcy)
     call dery (tf2,uz2,di2,sy,ffyp,fsyp,fwyp,ppy,ysize(1),ysize(2),ysize(3),1,ubcz)
 
-
+#ifdef DEBG
+    dep=maxval(abs(td2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR td2 (du) MAX ', dep1
+#endif
 
     ! Convective terms of y-pencil in tg2,th2,ti2
     if (ilmn) then
@@ -176,7 +210,11 @@ contains
       th2(:,:,:) = th2(:,:,:) + uy2(:,:,:) * te2(:,:,:)
       ti2(:,:,:) = ti2(:,:,:) + uy2(:,:,:) * tf2(:,:,:)
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(tg2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR tg2 (duu+udu) MAX ', dep1
+#endif
 
 
     if (ilmn) then
@@ -204,7 +242,11 @@ contains
        te3(:,:,:) = uy3(:,:,:) * uz3(:,:,:)
        tf3(:,:,:) = uz3(:,:,:) * uz3(:,:,:)
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(td3))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR td3 (uu) MAX ', dep1
+#endif
 
     call derz (tg3,td3,di3,sz,ffz,fsz,fwz,zsize(1),zsize(2),zsize(3),0,ubcx*ubcz)
     call derz (th3,te3,di3,sz,ffz,fsz,fwz,zsize(1),zsize(2),zsize(3),0,ubcy*ubcz)
@@ -236,7 +278,11 @@ contains
        tb3(:,:,:) = tb3(:,:,:) + rho3(:,:,:) * uy3(:,:,:) * divu3(:,:,:)
        tc3(:,:,:) = tc3(:,:,:) + rho3(:,:,:) * uz3(:,:,:) * divu3(:,:,:)
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(ta3))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR ta3 (duu+udu) MAX ', dep1
+#endif
 
     ! Convective terms of z-pencil are in ta3 -> td3, tb3 -> te3, tc3 -> tf3
     td3(:,:,:) = ta3(:,:,:)
@@ -269,7 +315,11 @@ contains
     tg2(:,:,:) = td2(:,:,:) - half * tg2(:,:,:)
     th2(:,:,:) = te2(:,:,:) - half * th2(:,:,:)
     ti2(:,:,:) = tf2(:,:,:) - half * ti2(:,:,:)
-
+#ifdef DEBG
+    dep=maxval(abs(tg2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR tg2 (Conv+Diff)) MAX ', dep1
+#endif
 
 
     !DIFFUSIVE TERMS IN Y
@@ -351,6 +401,17 @@ contains
           
        endif
     endif
+#ifdef DEBG
+    dep=maxval(abs(td2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR td2 (Diff Y) MAX ', dep1
+    dep=maxval(abs(te2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR te2 (Diff Y) MAX ', dep1
+    dep=maxval(abs(tf2))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR tf2 (Diff Y) MAX ', dep1
+#endif
 
 
     ! Add diffusive terms of y-pencil to convective and diffusive terms of y- and z-pencil
@@ -383,16 +444,47 @@ contains
       te1(:,:,:) = xnu * te1(:,:,:)
       tf1(:,:,:) = xnu * tf1(:,:,:)
     endif
+#ifdef DEBG
+    dep=maxval(abs(td1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR td1 (Diff X) MAX ', dep1
+    dep=maxval(abs(te1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR te1 (Diff X) MAX ', dep1
+    dep=maxval(abs(tf1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## SUB momentum_rhs_eq VAR tf1 (Diff X) MAX ', dep1
+#endif
 
     !FINAL SUM: DIFF TERMS + CONV TERMS
     dux1(:,:,:,1) = ta1(:,:,:) - half*tg1(:,:,:)  + td1(:,:,:)
     duy1(:,:,:,1) = tb1(:,:,:) - half*th1(:,:,:)  + te1(:,:,:)
     duz1(:,:,:,1) = tc1(:,:,:) - half*ti1(:,:,:)  + tf1(:,:,:)
-
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS duz1 ', dep1
+#endif
     if (ilmn) then
        call momentum_full_viscstress_tensor(dux1(:,:,:,1), duy1(:,:,:,1), duz1(:,:,:,1), divu3, mu1)
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS VisTau dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS VisTau duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS VisTau duz1 ', dep1
+#endif
 
     ! If LES modelling is enabled, add the SGS stresses
     if (ilesmod.ne.0.and.jles.le.3.and.jles.gt.0) then
@@ -401,7 +493,17 @@ contains
        duy1(:,:,:,1) = duy1(:,:,:,1) + sgsy1(:,:,:)
        duz1(:,:,:,1) = duz1(:,:,:,1) + sgsz1(:,:,:)
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS LES dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS LES duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS LES duz1 ', dep1
+#endif
 
     if (ilmn) then
       !! Gravity
@@ -414,9 +516,30 @@ contains
         call momentum_gravity(dux1, duy1, duz1, phi1(:,:,:,is), ri(is))
       enddo
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS ILMN dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS ILMN duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS ILMN duz1 ', dep1
+#endif
     !! Additional forcing
     call momentum_forcing(dux1, duy1, duz1, rho1, ux1, uy1, uz1, phi1)
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Forc dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Forc duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Forc duz1 ', dep1
+#endif
 
     !! Turbine forcing
     if (iturbine.eq.1) then
@@ -428,13 +551,34 @@ contains
        duy1(:,:,:,1)=duy1(:,:,:,1)+Fdiscy(:,:,:)/rho_air
        duz1(:,:,:,1)=duz1(:,:,:,1)+Fdiscz(:,:,:)/rho_air
     endif
-
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Turb dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Turb duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Turb duz1 ', dep1
+#endif
 
     if (itrip == 1) then
        !call tripping(tb1,td1)
        call tbl_tripping(duy1(:,:,:,1),td1)
        if ((nrank==0).and.(mod(itime,ilist)==0)) write(*,*) 'TRIPPING!!'
     endif
+#ifdef DEBG
+    dep=maxval(abs(dux1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Trip dux1 ', dep1
+    dep=maxval(abs(duy1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Trip duy1 ', dep1
+    dep=maxval(abs(duz1))
+    call MPI_ALLREDUCE(dep,dep1,1,real_type,MPI_MAX,MUI_COMM_WORLD,code)
+    if (nrank == 0) write(*,*)'## MomRHS Trip duz1 ', dep1
+#endif
 
   end subroutine momentum_rhs_eq
   !############################################################################
@@ -629,12 +773,12 @@ contains
 
     !! Y-gravity
     if (abs(gravy) > tiny(gravy)) then
-    if (nclx1.eq.2.or. nclx1.eq.3) then
+    if (nclx1.eq.2) then
        istart = 2
     else
        istart = 1
     endif
-    if (nclxn.eq.2 .or. nclxn.eq.3) then
+    if (nclxn.eq.2) then
        iend = xsize(1) - 1
     else
        iend = xsize(1)
@@ -670,12 +814,12 @@ contains
 
     !! Z-gravity
     if (abs(gravz) > tiny(gravz)) then
-    if (nclx1.eq.2.or. nclx1.eq.3) then
+    if (nclx1.eq.2) then
        istart = 2
     else
        istart = 1
     endif
-    if (nclxn.eq.2 .or. nclxn.eq.3) then
+    if (nclxn.eq.2) then
        iend = xsize(1) - 1
     else
        iend = xsize(1)

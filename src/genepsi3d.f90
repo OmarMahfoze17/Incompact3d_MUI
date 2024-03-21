@@ -10,13 +10,15 @@ contains
 
   subroutine epsi_init(ep1)
 
-    USE param, only : zero, one, dx, dz
+    USE param, only : zero, one, dx, dz,iibm,iibm_read_geom
     USE decomp_2d, only : xstart, xend, xsize, mytype, nrank
+    USE decomp_2d_io, only : decomp_2d_read_one
     !USE decomp_2d_io
     USE variables, only : yp, ny, MUI_COMM_WORLD
 
     implicit none
     real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ep1
+    character(len=*), parameter :: io_geom = "io-geom"
     logical :: dir_exists
 
 #ifdef DEBG
@@ -33,7 +35,17 @@ contains
     end if
     !###################################################################
     ep1(:,:,:)=zero
-    call geomcomplex(ep1,xstart(1),xend(1),ny,xstart(2),xend(2),xstart(3),xend(3),dx,yp,dz,one)
+    if (iibm_read_geom .eq. 1) then
+      if (nrank==0) print *,'Reading geometry'
+      if (iibm .ne. 1) then
+         if (nrank==0) print *, "The current function to read the complex geometry only works with iibm=1, i.e. direct forcing method"
+         stop
+      endif
+      call decomp_2d_read_one(1,ep1,'./geometry','epsilon.bin',io_geom) 
+    else
+
+      call geomcomplex(ep1,xstart(1),xend(1),ny,xstart(2),xend(2),xstart(3),xend(3),dx,yp,dz,one)
+    endif
 
 #ifdef DEBG
     if (nrank .eq. 0) write(*,*)'# body_init done'

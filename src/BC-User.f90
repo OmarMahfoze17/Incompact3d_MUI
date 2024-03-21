@@ -83,11 +83,6 @@ contains
     IF (nclxn.EQ.2) THEN
     ENDIF
 
-    IF (nclx1.EQ.3) THEN
-    ENDIF
-    IF (nclxn.EQ.3) THEN
-    ENDIF
-
     IF (ncly1.EQ.2) THEN
     ENDIF
     IF (nclyn.EQ.2) THEN

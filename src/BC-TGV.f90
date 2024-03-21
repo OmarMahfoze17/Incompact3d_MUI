@@ -149,11 +149,6 @@ contains
     if (nclxn == 2) then
     endif
 
-    if (nclx1 == 3) then
-    endif
-    if (nclxn == 3) then
-    endif
-
     if (ncly1 == 2) then
     endif
     if (nclyn == 2) then

@@ -564,7 +564,6 @@ contains
 
        call momentum_forcing_abl(dux1, duy1, duz1, ux1, uy1, uz1, phi1)
 
-
     endif
 
   end subroutine momentum_forcing

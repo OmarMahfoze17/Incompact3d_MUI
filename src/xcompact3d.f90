@@ -35,7 +35,8 @@ program xcompact3d
         call read_inflow(ux_inflow,uy_inflow,uz_inflow,itime/ntimesteps)
      endif
 
-     if ((itype.eq.itype_abl.or.iturbine.ne.0).and.(ifilter.ne.0).and.(ilesmod.ne.0)) then
+     if ((ifilter.ne.0).and.(ilesmod.ne.0)) then
+        if (nrank==0) write(*,*) "Filtering the velocity and scalar fields. ifilter and C_filter =",ifilter, C_filter
         call filter(C_filter)
         call apply_spatial_filter(ux1,uy1,uz1,phi1)
      endif

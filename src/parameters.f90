@@ -67,7 +67,7 @@ subroutine parameter(input_i3d)
        alpha_sc, beta_sc, g_sc, Tref
   NAMELIST /LESModel/ jles, smagcst, smagwalldamp, nSmag, walecst, maxdsmagcst, iconserv
   NAMELIST /Tripping/ itrip,A_tr,xs_tr_tbl,ys_tr_tbl,ts_tr_tbl,x0_tr_tbl
-  NAMELIST /ibmstuff/ cex,cey,cez,ra,rai,rao,nobjmax,nraf,nvol,iforces, npif, izap, ianal, imove, thickness, chord, omega ,ubcx,ubcy,ubcz,rads, c_air
+  NAMELIST /ibmstuff/ iibm_read_geom,cex,cey,cez,ra,rai,rao,nobjmax,nraf,nvol,iforces, npif, izap, ianal, imove, thickness, chord, omega ,ubcx,ubcy,ubcz,rads, c_air
   NAMELIST /ForceCVs/ xld, xrd, yld, yud!, zld, zrd
   NAMELIST /LMN/ dens1, dens2, prandtl, ilmn_bound, ivarcoeff, ilmn_solve_temp, &
        massfrac, mol_weight, imultispecies, primary_species, &
@@ -112,7 +112,6 @@ subroutine parameter(input_i3d)
 
   !! These are the 'essential' parameters
   read(10, nml=BasicParam); rewind(10)
-
   if (nz==1) then
      if (nrank==0) write(*,*) "Warning : support for 2D simulations is experimental"
      nclz1 = 0
@@ -567,7 +566,7 @@ subroutine parameter(input_i3d)
      npif=npif+1
   endif
 
-  if (nclx1==3.or.nclxn==3.or.ncly1==3.or.nclyn==3.or.nclz1==3.or.nclzn==3) then
+  if (nclxCPL1==3.or.nclxCPLn==3.or.nclyCPL1==3.or.nclyCPLn==3.or.nclzCPL1==3.or.nclzCPLn==3) then
    if (trim(MUIcommandArgs).eq.trim('coupled')) then 
       if (nrank==0) then
          write(*,*) '==========================================================='

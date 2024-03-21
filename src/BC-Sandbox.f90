@@ -119,8 +119,8 @@ contains
     real(mytype),dimension(xsize(1),xsize(2),xsize(3)) :: ux,uy,uz
     real(mytype),dimension(xsize(1),xsize(2),xsize(3),numscalar) :: phi1
 
-    if (nclx1 .eq. 2 .or. nclx1 .eq. 3) call inflow (phi1)
-    if (nclxn .eq. 2 .or. nclxn .eq. 3) call outflow (ux,uy,uz,phi1)
+    if (nclx1 .eq. 2) call inflow (phi1)
+    if (nclxn .eq. 2) call outflow (ux,uy,uz,phi1)
     if (nclx) call flow_rate_control(ux)
     if (sz_a_i .gt. 1) call flow_rate_control_SZA(ux, uy, uz)
     if (iscalar .eq. 1) call deposit(phi1)

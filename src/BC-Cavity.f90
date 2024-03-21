@@ -75,11 +75,6 @@ contains
       END IF
       IF (nclxn == 2) THEN
       END IF
-      IF (nclx1 == 3) THEN
-      END IF
-      IF (nclxn == 3) THEN
-      END IF
-
       IF (ncly1 == 2) THEN
       END IF
       IF (nclyn == 2) THEN

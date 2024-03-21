@@ -35,6 +35,8 @@ ilast = 25000         ! Last iteration
 ilesmod=1             ! if 0 then DNS
 numscalar = 0         ! How many scalars? (Set to zero to disable scalars)
 iibm=0                ! Flag for immersed boundary method
+ifilter = 0
+C_filter = 0.49
 
 ! Boundary and initial conditions
 iin = 1               ! Inflow conditions (1: classic, 2: turbinit)
