@@ -100,7 +100,7 @@ contains
         !
     else
       ! Just the standard epsi(nx,ny,nz) is loaded
-      print *,'Invalid parameters at geomcomplex_sandbox'
+      write(*,*)'Invalid parameters at geomcomplex_sandbox'
       call MPI_ABORT(MPI_COMM_WORLD,code,ierror); stop
     endif
     !

@@ -53,28 +53,28 @@ module variables
   character(len=1024) :: domainName, interfaceName
   character(len=1024) :: sptlSmpType,tmpSmpType
   character(len=1024) :: arg_interface_count
-  integer(c_int) :: interface_count,nForget,nSyncAhead=0,iSync=1
+  integer(c_int) :: interface_count,nForget,nSyncAhead=0,iSync=0,smartSendReceive = 0
+  integer :: sendReceiveMode,pushInterfacefsID = 1 ,fetchInterfacefsID=1 
   character(:), allocatable, target :: interfaces3d(:)
   character(:), allocatable :: domain3d
   integer :: interfaceDirection(200), interfaceLocation(200)
-  integer,allocatable,dimension(:) :: ifsDir,ifsLoc
   integer :: groupNumb  ! number of data groups to be pushed. The group is defined as a box 
   integer :: groupVort(200,6)
+  integer, allocatable,dimension(:,:) :: groupVortLocal
   !The domain is alwyes start at (0,0,0), but there are cases where 
   !data is needed to be pushed/fitched to/from domain that is shifted from 0  
   real(mytype) :: dataOrgShft(3) = 0.0_mytype
 
   type(c_ptr), target :: uniface_3d=c_null_ptr
-  type(c_ptr), target :: spatial_sampler=c_null_ptr
-  type(c_ptr), target :: temporal_sampler=c_null_ptr
+  type(c_ptr), target :: spatial_sampler=c_null_ptr,spatial_sync=c_null_ptr
+  type(c_ptr), target :: temporal_sampler=c_null_ptr,temporal_sync=c_null_ptr
   real(c_double) :: tolerance=1e-37_c_double
   real(c_double) :: spatialScale = 1.0_c_double,timeScale = 1.0_c_double
   ! integer(c_int) :: MUI_COMM_WORLD
   
   integer :: MUI_x1_ID,MUI_xn_ID,MUI_y1_ID,MUI_yn_ID,MUI_z1_ID,MUI_zn_ID   
-  integer :: MUIBC_ID(6),sendReceiveMode
   Integer :: nclxCPL1,nclxCPLn,nclyCPL1,nclyCPLn,nclzCPL1,nclzCPLn
-  Integer :: nclxCrr1,nclxCrrn,nclyCrr1,nclyCrrn,nclzCrr1,nclzCrrn
+  Integer :: nclxCrr1=0,nclxCrrn=1,nclyCrr1=0,nclyCrrn=0,nclzCrr1=0,nclzCrrn=0
 
   ! RBF filter varaibles
   real(c_double) :: rSpatialSamp = 1.0_c_double,sigmaSpatialSamp = 1.0_c_double
@@ -83,13 +83,13 @@ module variables
 
   ABSTRACT INTERFACE
      SUBROUTINE MUI_FETCH_FUNS(uniface,attr,point_1,point_2,point_3,t,spatial_sampler, &
-      temporal_sampler,return_value)
+      temporal_sampler,value)
        use decomp_2d, only : mytype
        import :: c_ptr,c_char,c_double
       type(c_ptr), intent(in), value :: uniface,spatial_sampler,temporal_sampler
       character(kind=c_char), intent(in) :: attr(*)
       real(kind=c_double), intent(in) :: point_1,point_2,point_3,t
-      real(kind=c_double), intent(out) :: return_value
+      real(kind=c_double),dimension(3), intent(out) :: value
      END SUBROUTINE MUI_FETCH_FUNS
   END INTERFACE
   PROCEDURE (MUI_FETCH_FUNS), POINTER :: mui_fetch

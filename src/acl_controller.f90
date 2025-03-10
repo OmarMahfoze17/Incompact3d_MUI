@@ -344,7 +344,7 @@ contains
 
             ! Output debugging information if requested:
             !if (nrank==0) then
-            !   print *, Time, control%ElapTime, control%GenSpeed/RPM2RPS, control%GenSpeedF/RPM2RPS, control%GenTrq, rotSpeed 
+            !   write(*,*) Time, control%ElapTime, control%GenSpeed/RPM2RPS, control%GenSpeedF/RPM2RPS, control%GenTrq, rotSpeed 
             !endif
          endif
 

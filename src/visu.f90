@@ -77,7 +77,7 @@ contains
     if (output2D < 0 .or. output2D > 3 &
         .or. (output2d == 2.and.istret /= 0)) then
       if (nrank.eq.0) write(*,*) "Visu module: incorrect value for output2D."
-      call MPI_ABORT(MUI_COMM_WORLD, 0, noutput)
+      call MPI_ABORT(MPI_COMM_WORLD, 0, noutput)
       stop
     endif
 
@@ -207,7 +207,7 @@ contains
     ! Update log file
     if (nrank.eq.0) then
       call cpu_time(tstart)
-      print *,'Writing snapshots =>',itime/ioutput
+      write(*,*)'Writing snapshots =>',itime/ioutput
     end if
 
 #ifdef ADIOS2
@@ -337,7 +337,7 @@ contains
   !
   subroutine write_xdmf_header(pathname, filename, num)
 
-    use variables, only : nvisu, yp
+    use variables, only : nvisu, yp,spatialScale,dataOrgShft
     use param, only : dx,dy,dz,istret
     use decomp_2d, only : mytype, nrank, xszV, yszV, zszV, ystV
 
@@ -363,10 +363,10 @@ contains
       call write_xdmf_topo()
       if (istret.ne.0) then
         do i=1,xszV(1)
-          xp(i) = real(i-1,mytype)*dx*nvisu
+          xp(i) = real(i-1,mytype)*dx*nvisu * spatialScale + dataOrgShft(1)
         enddo
         do k=1,zszV(3)
-          zp(k) = real(k-1,mytype)*dz*nvisu
+          zp(k) = real(k-1,mytype)*dz*nvisu * spatialScale + dataOrgShft(3)
         enddo
         write(ioxdmf,*)'    <Geometry name="geo" Type="VXVYVZ">'
         if (output2D.ne.1) then
@@ -379,10 +379,10 @@ contains
         write(ioxdmf,*)'        </DataItem>'
         if (output2D.ne.2) then
           write(ioxdmf,*)'        <DataItem Dimensions="',yszV(2),'" NumberType="Float" Precision="4" Format="XML">'
-          write(ioxdmf,*)'        ',yp(ystV(1)::nvisu)
+          write(ioxdmf,*)'        ',yp(ystV(1)::nvisu)* spatialScale + dataOrgShft(2)
         else
           write(ioxdmf,*)'        <DataItem Dimensions="1" NumberType="Float" Precision="4" Format="XML">'
-          write(ioxdmf,*)'        ',yp(1)
+          write(ioxdmf,*)'        ',yp(1)* spatialScale + dataOrgShft(2)
         endif
         write(ioxdmf,*)'        </DataItem>'
         if (output2D.ne.3) then

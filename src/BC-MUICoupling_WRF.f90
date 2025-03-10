@@ -9,6 +9,7 @@ module MUIcoupledBC_WRF
   use param
   use tbl, only :blasius
   use abl, only : inflow, outflow
+  use MUIcoupledBC, only : pushMUI
 
   implicit none
 
@@ -39,7 +40,7 @@ contains
     real(mytype),dimension(xsize(1),xsize(2),xsize(3),numscalar) :: phi1
 
     real(mytype) :: y,r,um,r3,x,z,h,ct, grdSpce(3),dataLoc(3),cplTime
-    real(mytype) :: cx0,cy0,cz0,hg,lg
+    real(mytype) :: cx0,cy0,cz0,hg,lg,temp(3)
     integer :: k,j,i,ierror,ii,is,it,code
 
     integer, dimension (:), allocatable :: seed
@@ -72,7 +73,7 @@ contains
    !  elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
    !    call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location
    !  else
-   !    print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
+   !    write(*,*) "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
    !    stop
    !  endif
 
@@ -93,7 +94,7 @@ contains
 
         cplTime = 0.0
       do k = 1, xsize(3)
-        print*, "xcomcapt initaite  ", k 
+        write(*,*) "xcomcapt initaite  ", k ,'test', xsize(2),xsize(1)
         do j = 1, xsize(2)
           
           do i=1,xsize(1)
@@ -102,19 +103,16 @@ contains
             dataLoc(3) = real((k+xstart(3)-1-1),mytype)*grdSpce(3)
 
             dataLoc = dataLoc * spatialScale + dataOrgShft
-            ! if (Loc==xlx)print *, "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
-            call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, dataLoc(1), dataLoc(3), &
-            dataLoc(2), cplTime, spatial_sampler, temporal_sampler, ux1(i,j,k))
-            call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, dataLoc(1), dataLoc(3), &
-            dataLoc(2), cplTime, spatial_sampler, temporal_sampler, uy1(i,j,k))
-            call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, dataLoc(1), dataLoc(3), &
-            dataLoc(2), cplTime, spatial_sampler, temporal_sampler, uz1(i,j,k))
+            ! if (Loc==xlx)write(*,*) "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
+            call mui_fetch(uniface_pointers_3d(fetchInterfacefsID)%ptr, "velocity"//c_null_char, dataLoc(1), dataLoc(2), &
+            dataLoc(3), cplTime, spatial_sampler, temporal_sampler, temp)
 
-            ux1(i,j,k)=ux1(i,j,k)+(two*noiseX(i,j,k)-one)*init_noise*um
-            uy1(i,j,k)=uy1(i,j,k)+(two*noisey(i,j,k)-one)*init_noise*um
-            uz1(i,j,k)=uz1(i,j,k)+(two*noisez(i,j,k)-one)*init_noise*um
             
-            ! if (k==1 .and. j==1 .and. i==1) print*, "Xcompact initiat: ", dataLoc(1), dataLoc(3), dataLoc(2), ux1(i,j,k),uy1(i,j,k),uz1(i,j,k)
+            ux1(i,j,k)=temp(1)+(two*noiseX(i,j,k)-one)*init_noise*um
+            uy1(i,j,k)=temp(2)+(two*noisey(i,j,k)-one)*init_noise*um
+            uz1(i,j,k)=temp(3)+(two*noisez(i,j,k)-one)*init_noise*um
+            
+            if (k==1 .and. j==1 .and. i==1) write(*,*) "Xcompact initiat: ", dataLoc(1), dataLoc(3), dataLoc(2), ux1(i,j,k),uy1(i,j,k),uz1(i,j,k)
           enddo
         end do
           
@@ -171,9 +169,12 @@ contains
     bzx1 = 0.0_mytype ; bzy1 = 0.0_mytype; bzz1 = 0.0_mytype
     bzxn = 0.0_mytype ; bzyn = 0.0_mytype; bzzn = 0.0_mytype
 
-   if (nrank ==0 ) write(*,*) "Fetcheing at ", t * timeScale 
-   call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "tempvalue"//c_null_char,0.0_mytype,0.0_mytype,0.0_mytype,real(5.123,mytype))
-   call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, t * timeScale )
+   if (nrank ==0 ) write(*,*) trim(domainName),":Fetcheing at ", t * timeScale 
+  !  call mui_push_3d_f(uniface_pointers_3d(fetchInterfacefsID)%ptr, "tempvalue"//c_null_char, &
+  !         0.0_mytype,0.0_mytype,0.0_mytype,real(5.123,mytype))
+   call mui_commit_3d_f(uniface_pointers_3d(fetchInterfacefsID)%ptr, t * timeScale )
+
+  !  call mui_barrier_3d_f(uniface_pointers_3d(fetchInterfacefsID)%ptr,t * timeScale)
    
    call cpu_time(recTime1)
     if (nclxCPL1 .eq. 1) then 
@@ -246,21 +247,12 @@ contains
     endif
 
     call cpu_time(recTime2)
-    if (nrank==0) print *, "MUI: Receiving CPU time ", recTime2-recTime1
+    if (nrank==0) write(*,*) "MUI: Receiving CPU time ", recTime2-recTime1
 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !!!!!!!!!! Apply BC to the velocity 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    if (nclx1==2) then 
-      ux1(1,:,:) = bxx1(:,:)
-      uy1(1,:,:) = bxy1(:,:)
-      uz1(1,:,:) = bxz1(:,:)
-    endif
-    if (nclxn==2) then 
-      ux1(nx,:,:) = bxxn(:,:) 
-      uy1(nx,:,:) = bxyn(:,:)
-      uz1(nx,:,:) = bxzn(:,:)
-    endif
+    
 
     if (xstart(2)==1 .and. ncly1==2) then !! CPUs at the bottom
       ux1(:,1,:) = byx1(:,:)
@@ -282,6 +274,16 @@ contains
         ux1(:,:,xsize(3)) = bzxn(:,:)
         uy1(:,:,xsize(3)) = bzyn(:,:)
         uz1(:,:,xsize(3)) = bzzn(:,:)
+    endif 
+    if (nclx1==2) then 
+      ux1(1,:,:) = bxx1(:,:)
+      uy1(1,:,:) = bxy1(:,:)
+      uz1(1,:,:) = bxz1(:,:)
+    endif
+    if (nclxn==2) then 
+      ux1(nx,:,:) = bxxn(:,:) 
+      uy1(nx,:,:) = bxyn(:,:)
+      uz1(nx,:,:) = bxzn(:,:)
     endif 
     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     !! Mass flow rate correction
@@ -356,70 +358,51 @@ contains
     utt6=utt6/real(nx,mytype) * xlx  * faceNormalz(2) !! Volume flow rate 
   
    if ((nrank==0).and.(mod(itime,ilist)==0)) then
-      print *, "WRF mass left/right" ,utt1,utt2
-      print *, "WRF mass bottm/top" ,utt3,utt4
-      print *, "WRF mass front/back" ,utt5,utt6
+      write(*,*) trim(domainName),' ',"WRF mass left/right" ,utt1,utt2
+      write(*,*) trim(domainName),' ',"WRF mass bottm/top" ,utt3,utt4
+      write(*,*) trim(domainName),' ',"WRF mass front/back" ,utt5,utt6
 
-      print *, "Mass diff ", utt1+utt2+utt3+utt4+utt5+utt6
+      write(*,*) trim(domainName),' ',"Mass diff ", utt1+utt2+utt3+utt4+utt5+utt6
    endif
-   nclxCrr1 = 1
-   nclxCrrn =1
+
    mssFlwDiff = utt1+utt2+utt3+utt4+utt5+utt6
    massFlWTotal = abs(utt1*nclxCrr1)+abs(utt2*nclxCrrn)+abs(utt3*nclyCrr1)+abs(utt4*nclyCrrn) &
                   +abs(utt5*nclzCrr1)+abs(utt6*nclzCrrn)
    totalFaceArea = zlz*yly*(nclxCrr1+nclxCrrn) + xlx * yly*(nclyCrr1+nclyCrrn) &
                   + zlz * xlx*(nclzCrr1+nclzCrrn)
    
-   if (nrank==0) print *, "Correcetion", utt1/(yly*zlz),utt2/(yly*zlz),massFlWTotal
    mssFlwDiffFace(1) =  mssFlwDiff * nclxCrr1   ! left face
    mssFlwDiffFace(2) =  mssFlwDiff * nclxCrrn   ! right face
 
-   mssFlwDiffFace(3) =  mssFlwDiff * nclyCrr1 / totalFaceArea  ! bottom face
-   mssFlwDiffFace(4) =  mssFlwDiff * nclyCrrn/ totalFaceArea  ! top face
+   mssFlwDiffFace(3) =  mssFlwDiff * nclyCrr1   ! bottom face
+   mssFlwDiffFace(4) =  mssFlwDiff * nclyCrrn  ! top face
 
-   mssFlwDiffFace(5) =  mssFlwDiff * nclzCrr1 / totalFaceArea  ! front face
-   mssFlwDiffFace(6) =  mssFlwDiff * nclzCrrn / totalFaceArea  ! back face 
+   mssFlwDiffFace(5) =  mssFlwDiff * nclzCrr1  ! front face
+   mssFlwDiffFace(6) =  mssFlwDiff * nclzCrrn  ! back face 
 
-  !  !  print *, "totalFaceArea = " , totalFaceArea, mssFlwDiffFace
-  !  bxx1 = bxx1 - mssFlwDiffFace(1) * faceNormalx(1) 
-  !  bxxn = bxxn - mssFlwDiffFace(2) * faceNormalx(2) 
+   bxx1 = bxx1 - abs(utt1)/massFlWTotal * mssFlwDiffFace(1) * faceNormalx(1) /(yly*zlz)
+   bxxn = bxxn - abs(utt2)/massFlWTotal * mssFlwDiffFace(2) * faceNormalx(2) /(yly*zlz)
     
-  !  if (xstart(2)==1) byy1 = byy1 - mssFlwDiffFace(3) * faceNormaly(1) 
-  !  if (xend(2)==ny)  byyn = byyn - mssFlwDiffFace(4) * faceNormaly(2) 
+   if (xstart(2)==1) byy1 = byy1 - abs(utt3)/massFlWTotal * mssFlwDiffFace(3) * faceNormaly(1) /(xlx*zlz)
+   if (xend(2)==ny) byyn = byyn - abs(utt4)/massFlWTotal * mssFlwDiffFace(4) * faceNormaly(2) /(xlx*zlz)
 
-  !  if (xstart(3)==1) bzz1 = bzz1 - mssFlwDiffFace(5) * faceNormalz(1) 
-  !  if (xend(3)==nz)  bzzn = bzzn - mssFlwDiffFace(6) * faceNormalz(2) 
-  !  bxx1 = bxx1 - abs(utt1)/massFlWTotal * mssFlwDiffFace(1) * faceNormalx(1) /(yly*zlz)
-  !  bxxn = bxxn - abs(utt2)/massFlWTotal * mssFlwDiffFace(2) * faceNormalx(2) /(yly*zlz)
-  ! !  bxxn =bxxn + mssFlwDiff /(yly*zlz)
+   if (xstart(3)==1) bzz1 = bzz1 - abs(utt5)/massFlWTotal * mssFlwDiffFace(5) * faceNormalz(1) /(yly*xlx)
+   if (xend(3)==nz)  bzzn = bzzn - abs(utt6)/massFlWTotal * mssFlwDiffFace(6) * faceNormalz(2) /(yly*xlx)
 
-   if (nrank==0) print *, "Correcetion1", abs(utt1)/massFlWTotal * mssFlwDiffFace(1) * faceNormalx(1) /(yly*zlz),mssFlwDiff /(yly*zlz)
-   if (nrank==0) print *, "Correcetion2", abs(utt2)/massFlWTotal * mssFlwDiffFace(2) * faceNormalx(2) /(yly*zlz),ux1(1,10,10)
-  !  bxx1 = bxx1 * (utt1-mssFlwDiffFace(1)* faceNormalx(1) * zlz*yly)/utt1
-  !  bxxn = bxxn * (utt2-mssFlwDiffFace(2)* faceNormalx(2) * zlz*yly)/utt2
+   !!! Reapply the BC after the mass flow rate correction. 
+   ux1(1,:,:)=bxx1(:,:)
+   ux1(nx,:,:)=bxxn(:,:)
+   if (xstart(2)==1) uy1(:,1,:)=byy1(:,:)
+   if (xend(2)==ny) uy1(:,xsize(2),:)=byyn(:,:)
 
-   
-
-  !  if (xstart(2)==1) uy1(:,1,:)=byy1(:,:)
-  !  if (xend(2)==ny) uy1(:,xsize(2),:)=byyn(:,:)
-
-  !  if (xstart(3)==1) uz1(:,:,1)=bzz1(:,:)
-  !  if (xend(3)==nz) uz1(:,:,xsize(3))=bzzn(:,:)
-
-   
+   if (xstart(3)==1) uz1(:,:,1)=bzz1(:,:)
+   if (xend(3)==nz) uz1(:,:,xsize(3))=bzzn(:,:)
 
    if ( iTime>=ifirst+nForget) then
-      if (nrank==0) write(*,*) "MUI: Forgeting log at time stamp of ", t-dt*nForget
-      call mui_forget_upper_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, &
+      if (nrank==0) write(*,*) trim(domainName), " Forgeting log at time stamp of ", t-dt*nForget
+      call mui_forget_upper_3d_f(uniface_pointers_3d(fetchInterfacefsID)%ptr, &
                real(t-dt*nForget,c_double),reset_log)
-   endif
-
-   
-
-
-    call tbl_flrt(ux1,uy1,uz1)
-
-    
+   endif   
 
     return
   end subroutine boundary_conditions_WRF
@@ -440,7 +423,7 @@ contains
 
     implicit none
 
-    real(mytype) :: Loc,yLoc,x, y, z
+    real(mytype) :: Loc,yLoc,x, y, z, temp(3)
     real(mytype),dimension(:,:), intent(inout):: bx,by,bz
 
     real(mytype) :: fetch_result_3d,dataLoc(3), grdSpce(3)
@@ -462,14 +445,13 @@ contains
                dataLoc(3) = real((k+xstart(3)-1-1),mytype)*grdSpce(3)
 
                dataLoc = dataLoc * spatialScale + dataOrgShft
-               ! if (Loc==xlx)print *, "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, bx(j,k))
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, by(j,k))
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, bz(j,k))
-               if (k==1 .and. j==1 .and. nrank==0) print*, "Xcompact : ", Loc, dataLoc(1), dataLoc(3), dataLoc(2), bx(j,k), by(j,k), bz(j,k)
+               ! if (Loc==xlx)write(*,*) "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
+               call mui_fetch(uniface_pointers_3d(fetchInterfacefsID)%ptr, "velocity"//c_null_char, dataLoc(1), dataLoc(2), &
+               dataLoc(3), cplTime, spatial_sampler, temporal_sampler, temp)
+               bx(j,k) = temp(1)
+               by(j,k) = temp(2)
+               bz(j,k) = temp(3)
+               if (k==2 .and. j==2 .and. nrank==0 .and. Loc==0.0_mytype) write(*,*) trim(domainName), cplTime, dataLoc(1), dataLoc(2), dataLoc(3), bx(j,k), by(j,k), bz(j,k)
 
             end do
          end do
@@ -485,22 +467,22 @@ contains
                dataLoc(3) = real((k+xstart(3)-1-1),mytype)*grdSpce(3)
 
                dataLoc = dataLoc * spatialScale + dataOrgShft
-               ! if (Loc==xlx)print *, "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
+               ! if (Loc==xlx)write(*,*) "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
 
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, bx(i,k))
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, by(i,k))
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, bz(i,k))
+               call mui_fetch(uniface_pointers_3d(fetchInterfacefsID)%ptr, "velocity"//c_null_char, dataLoc(1), dataLoc(2), &
+               dataLoc(3), cplTime, spatial_sampler, temporal_sampler, temp)
+               bx(i,k) = temp(1)
+               by(i,k) = temp(2)
+               bz(i,k) = temp(3)
 
             end do
          end do
       ! endif
    endif
 
-   ! Obtain the Horizontal BC, i.e. plane normal to y-direction
+   ! Obtain the vertical BC, i.e. plane normal to z-direction
    if (dimIndx==3) then 
+
          do j = 1, xsize(2)
             do i = 1, xsize(1)
                dataLoc(1) = real((i+xstart(1)-1-1),mytype)*grdSpce(1) 
@@ -508,14 +490,14 @@ contains
                dataLoc(3) = Loc 
 
                dataLoc = dataLoc * spatialScale + dataOrgShft
-               ! if (Loc==xlx)print *, "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
+               ! if (Loc==xlx)write(*,*) "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
 
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, bx(i,j))
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, by(i,j))
-               call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, dataLoc(1), dataLoc(3), &
-               dataLoc(2), cplTime, spatial_sampler, temporal_sampler, bz(i,j))
+               call mui_fetch(uniface_pointers_3d(fetchInterfacefsID)%ptr, "velocity"//c_null_char, dataLoc(1), dataLoc(2), &
+               dataLoc(3), cplTime, spatial_sampler, temporal_sampler, temp)
+               bx(i,j) = temp(1) 
+               by(i,j) = temp(2)
+               bz(i,j) = temp(3)
+
 
             end do
          end do
@@ -529,6 +511,7 @@ contains
    
    
    !  stop
+   
 end subroutine recieve_WRF
 
 !*******************************************************************************

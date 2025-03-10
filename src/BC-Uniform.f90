@@ -160,7 +160,7 @@ contains
       ! Reading from files (when precursor simulations exist)
       itime_input=mod(itime,ntimesteps)
       if (itime_input==0) itime_input=ntimesteps
-      if (nrank==0) print *,'Reading inflow from a file, time step: ', itime_input
+      if (nrank==0) write(*,*)'Reading inflow from a file, time step: ', itime_input
       do k=1,xsize(3)
       do j=1,xsize(2)
         ! Case 1: Inflow is turbulence added to mean flow profile

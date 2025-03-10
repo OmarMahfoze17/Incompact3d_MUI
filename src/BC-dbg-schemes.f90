@@ -230,7 +230,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdx1, 1))
-    print *, "dfdx1 RMS error: ", err
+    write(*,*) "dfdx1 RMS error: ", err
 
     err = 0._mytype
     do i = 1, size(dfdxp1, 1)
@@ -241,7 +241,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdxp1, 1))
-    print *, "dfdxp1 RMS error: ", err
+    write(*,*) "dfdxp1 RMS error: ", err
 
     err = 0._mytype
     do i = 1, size(dfdxx1, 1)
@@ -252,7 +252,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdxx1, 1))
-    print *, "dfdxx1 RMS error: ", err
+    write(*,*) "dfdxx1 RMS error: ", err
 
     err = 0._mytype
     do i = 1, size(dfdxxp1, 1)
@@ -263,7 +263,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdxxp1, 1))
-    print *, "dfdxxp1 RMS error: ", err
+    write(*,*) "dfdxxp1 RMS error: ", err
     
   end subroutine xerrors
   subroutine yerrors(dfdy1, dfdyp1, dfdyy1, dfdyyp1)
@@ -282,7 +282,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdy1, 2))
-    print *, "dfdy1 RMS error: ", err
+    write(*,*) "dfdy1 RMS error: ", err
 
     err = 0._mytype
     do j = 1, size(dfdyp1, 2)
@@ -293,7 +293,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdyp1, 2))
-    print *, "dfdyp1 RMS error: ", err
+    write(*,*) "dfdyp1 RMS error: ", err
 
     err = 0._mytype
     do j = 1, size(dfdyy1, 2)
@@ -304,7 +304,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdyy1, 2))
-    print *, "dfdyy1 RMS error: ", err
+    write(*,*) "dfdyy1 RMS error: ", err
 
     err = 0._mytype
     do j = 1, size(dfdyyp1, 1)
@@ -315,7 +315,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdyyp1, 2))
-    print *, "dfdyyp1 RMS error: ", err
+    write(*,*) "dfdyyp1 RMS error: ", err
     
   end subroutine yerrors
   subroutine zerrors(dfdz1, dfdzp1, dfdzz1, dfdzzp1)
@@ -334,7 +334,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdz1, 3))
-    print *, "dfdz1 RMS error: ", err
+    write(*,*) "dfdz1 RMS error: ", err
 
     err = 0._mytype
     do k = 1, size(dfdzp1, 3)
@@ -345,7 +345,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdzp1, 3))
-    print *, "dfdzp1 RMS error: ", err
+    write(*,*) "dfdzp1 RMS error: ", err
 
     err = 0._mytype
     do k = 1, size(dfdzz1, 3)
@@ -356,7 +356,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdzz1, 3))
-    print *, "dfdzz1 RMS error: ", err
+    write(*,*) "dfdzz1 RMS error: ", err
 
     err = 0._mytype
     do k = 1, size(dfdzzp1, 1)
@@ -367,7 +367,7 @@ contains
        err = err + (expt - avg)**2
     end do
     err = sqrt(err / size(dfdzzp1, 3))
-    print *, "dfdzzp1 RMS error: ", err
+    write(*,*) "dfdzzp1 RMS error: ", err
     
   end subroutine zerrors
   subroutine debug_schemes()

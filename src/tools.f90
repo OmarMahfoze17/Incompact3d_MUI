@@ -67,7 +67,7 @@ contains
 
         if (abs_prec(phimax1) > 100._mytype) then !if phi control turned off
            write(*,*) 'Scalar diverged! SIMULATION IS STOPPED!'
-           call MPI_ABORT(MUI_COMM_WORLD,code,ierror); stop
+           call MPI_ABORT(MPI_COMM_WORLD,code,ierror); stop
         endif
       endif
     enddo
@@ -121,13 +121,13 @@ contains
 
     if (nrank == 0) then
 
-       write(*,*) 'U,V,W min=',real(uxmin1,4),real(uymin1,4),real(uzmin1,4)
+       write(*,*) trim(domainName),' ','U,V,W min=',real(uxmin1,4),real(uymin1,4),real(uzmin1,4)
        write(*,*) 'U,V,W max=',real(uxmax1,4),real(uymax1,4),real(uzmax1,4)
-       !print *,'CFL=',real(abs(max(uxmax1,uymax1,uzmax1)*dt)/min(dx,dy,dz),4)
+       !write(*,*)'CFL=',real(abs(max(uxmax1,uymax1,uzmax1)*dt)/min(dx,dy,dz),4)
 
        if((abs_prec(uxmax1)>=onehundred*100.0).or.(abs_prec(uymax1)>=onehundred*100.0).OR.(abs_prec(uzmax1)>=onehundred*100.0)) then
-         write(*,*) 'Velocity diverged! SIMULATION IS STOPPED!'
-         call MPI_ABORT(MUI_COMM_WORLD,code,ierror)
+         write(*,*) trim(domainName),' ','Velocity diverged! SIMULATION IS STOPPED!'
+         call MPI_ABORT(MPI_COMM_WORLD,code,ierror)
          stop
        endif
 
@@ -164,7 +164,7 @@ contains
     else if ((iwhen == 3).and.(itime > ifirst)) then !AT THE END OF A TIME STEP
        if (nrank == 0.and.(mod(itime, ilist) == 0 .or. itime == ifirst .or. itime==ilast)) then
           call cpu_time(trank)
-          if (nrank==0) write(*,*) 'Time for this time step (s):',real(trank-time1)
+          if (nrank==0) write(*,*) trim(domainName),' Time for this time step (s):',real(trank-time1)
           telapsed = (trank-tstart)/threethousandsixhundred
           tremaining  = telapsed*(ilast-itime)/(itime-ifirst)
           write(*,"(' Remaining time:',I8,' h ',I2,' min')") int(tremaining), int((tremaining-int(tremaining))*sixty)
@@ -438,6 +438,7 @@ contains
          close(111)
          t0 = tfield
          itime0 = 0
+         ifirst = itime
        else
          t0 = zero
          itime0 = 0
@@ -450,7 +451,7 @@ contains
           write(*,*) '==========================================================='
           write(*,*) 'Error: Impossible to read '//trim(filestart)
           write(*,*) '==========================================================='
-          call MPI_ABORT(MUI_COMM_WORLD,code,ierror)
+          call MPI_ABORT(MPI_COMM_WORLD,code,ierror)
        endif
     endif
 
@@ -669,7 +670,7 @@ contains
     ! Read inflow
     write(fninflow,'(i20)') ifileinflow+1
     write(inflow_file, "(A)") trim(inflowpath)//'inflow'//trim(adjustl(fninflow))
-    if (nrank==0) print *,'READING INFLOW FROM ',inflow_file
+    if (nrank==0) write(*,*)'READING INFLOW FROM ',inflow_file
     
     call decomp_2d_open_io(io_ioflow, inflow_file, decomp_2d_read_mode)
     
@@ -696,7 +697,7 @@ contains
     integer, intent(in) :: timestep
     integer :: j,k
 
-    if (nrank==0.and.mod(itime,ilist)==0) print *, 'Appending outflow', timestep 
+    if (nrank==0.and.mod(itime,ilist)==0) write(*,*) 'Appending outflow', timestep 
     do k=1,xsize(3)
     do j=1,xsize(2)
       ux_recoutflow(timestep,j,k)=ux(xend(1),j,k)
@@ -732,7 +733,7 @@ contains
     
     write(fnoutflow,'(i20)') ifileoutflow
     write(outflow_file, "(A)") './out/inflow'//trim(adjustl(fnoutflow))
-    if (nrank==0) print *,'WRITING OUTFLOW TO ', outflow_file
+    if (nrank==0) write(*,*)'WRITING OUTFLOW TO ', outflow_file
     
     call decomp_2d_open_io(io_ioflow, outflow_file, iomode)
     call decomp_2d_start_io(io_ioflow, outflow_file)
@@ -1068,7 +1069,7 @@ contains
              end if
           else
              if (checked_initial) then
-                print *, "ERROR: old restart ", refname, " doesn't exist!"
+                write(*,*) "ERROR: old restart ", refname, " doesn't exist!"
                 success = .false.
              else
                 ! Must assume this is the first call to restart, no old restart should exist

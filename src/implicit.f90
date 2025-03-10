@@ -291,7 +291,7 @@ contains
     vvm=zero;wwm=zero;zzm=zero
     l1m=zero;l2m=zero;l3m=zero
 
-    print *,'NOT READY YET! SIMULATION IS STOPPED!'
+    write(*,*)'NOT READY YET! SIMULATION IS STOPPED!'
     call MPI_ABORT(MPI_COMM_WORLD,code,ierror); stop
 
   end subroutine ludecomp9_0
@@ -613,14 +613,14 @@ subroutine  inttimp (var1,dvar1,npaire,isc,forcing1)
   elseif (itimescheme.eq.4) then
      !>>> AB4
      if (nrank.eq.0) then
-        print *, "AB4 not implemented!"
+        write(*,*) "AB4 not implemented!"
         STOP
      endif
 
   else
      !>>> We should not be here
      if (nrank.eq.0) then
-        print *, "Unrecognised implicit itimescheme: ", itimescheme
+        write(*,*) "Unrecognised implicit itimescheme: ", itimescheme
      endif
      call MPI_ABORT(MPI_COMM_WORLD,code,ierror); stop
 

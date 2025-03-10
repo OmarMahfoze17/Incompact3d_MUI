@@ -68,7 +68,7 @@ contains
    !  elseif (nclx1==3) then  ! Use the orignial get inlet conditions from MUI interface
    !    call recieveMUIBC(bxx1,bxy1,bxz1,0.0_mytype) ! last argument is the x-location
    !  else
-   !    print *, "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
+   !    write(*,*) "ERROR: nclx1 = ", nclx1, " is wrong BC for this simulation type"
    !    stop
    !  endif
 
@@ -150,7 +150,7 @@ contains
     elseif (nclxn==3) then ! Get the oultet BC conditions from MUI interface 
       call recieveMUIBC(bxxn,bxyn,bxzn,xlx) ! last argument is the x-location 
     else
-      print *, "ERROR: nclxn = ", nclxn, " is wrong BC for this simulation type"
+      write(*,*) "ERROR: nclxn = ", nclxn, " is wrong BC for this simulation type"
       stop
     endif
 
@@ -214,7 +214,7 @@ contains
     real(mytype) :: xLoc,x, y, z
     real(mytype),dimension(xsize(2),xsize(3)) :: bxx,bxy,bxz
 
-    real(mytype) :: fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
+    real(mytype) :: fetch_result_3d,point_x,point_y,point_z, grdSpce(3),temp(3)
     integer :: i, j, k, reset_log=1
     grdSpce(1) = xlx/(nx-1)
     grdSpce(2) = yly/(ny-1)
@@ -225,23 +225,24 @@ contains
          point_x = xLoc + dataOrgShft(1)
          point_y = yp(j+xstart(2)-1) + dataOrgShft(2)
          point_z = real((k+xstart(3)-1-1),mytype)*grdSpce(3) + dataOrgShft(3)
-         ! if (xLoc==xlx)print *, "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
+         ! if (xLoc==xlx)write(*,*) "MUI domain ",trim(domainName)," is Receivinfg at location", point_x, point_y, point_z
 
-         call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "ux"//c_null_char, point_x, point_y, &
-         point_z, t, spatial_sampler, temporal_sampler, bxx(j,k))
-         call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uy"//c_null_char, point_x, point_y, &
-         point_z, t, spatial_sampler, temporal_sampler, bxy(j,k))
-         call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "uz"//c_null_char, point_x, point_y, &
-         point_z, t, spatial_sampler, temporal_sampler, bxz(j,k))
+         call mui_fetch(uniface_pointers_3d(fetchInterfacefsID)%ptr, "velocity"//c_null_char, point_x, point_y, &
+         point_z, t* timeScale, spatial_sampler, temporal_sampler, temp)
+
+         bxx(j,k) = temp(1) 
+         bxy(j,k) = temp(2)
+         bxz(j,k) = temp(3)
+
 
       end do
    end do
 
    
    if ( iTime>=ifirst+nForget) then
-      if (nrank==0) write(*,*) "MUI: Forgeting log at time stamp of ", t-dt*nForget
-      call mui_forget_upper_3d_f(uniface_pointers_3d(MUIBC_ID(1))%ptr, &
-               real(t-dt*nForget,c_double),reset_log)
+      if (nrank==0) write(*,*) "MUI: Forgeting log at time stamp of ", (t-dt*nForget)* timeScale
+      call mui_forget_upper_3d_f(uniface_pointers_3d(fetchInterfacefsID)%ptr, &
+               real((t-dt*nForget)* timeScale,c_double),reset_log)
    endif
    !  stop
 end subroutine recieveMUIBC
@@ -262,88 +263,72 @@ subroutine pushMUI(ux1, uy1, uz1)
 
       implicit none
       real(mytype), dimension(xsize(1), xsize(2), xsize(3)), intent(in) :: ux1, uy1, uz1
-      real(mytype) :: delta_int, delta_eta, eps_eta,TempValue
+      real(mytype) :: delta_int, delta_eta, eps_eta,TempValue,dataLoc(3),temp(3)
       real(mytype) :: sndTime1,sndTime2
       real(mytype) :: x, y, z,fetch_result_3d,point_x,point_y,point_z, grdSpce(3)
-      integer :: i, j, k, is,iGrp
-      integer, allocatable,dimension(:,:) :: groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
-      allocate(groupVortLocal(groupNumb,6))
+      integer :: i, j, k, is,iGrp,reset_log=1
+      ! integer, allocatable,dimension(:,:) :: groupVortLocal  ! the group is defined with votecies (ix1,ix2,jy1,jy2,kz1,kz2)
+      
       !!! DO NOT use dx,dy,dz used in the code as their values depends on the BC not the actual grid spacing.
       grdSpce(1) = xlx/(nx-1)
       grdSpce(2) = yly/(ny-1)
       grdSpce(3) = zlz/(nz-1)
 
-      !!! Define the local index of points of each  group 
-      groupVortLocal = 0
-      do iGrp = 1, groupNumb
-         do j=1,3
-            i=j*2-1
-            if (groupVort(iGrp,i)>=xstart(j) .and. groupVort(iGrp,i) <=xend(j)) then
-               groupVortLocal(iGrp,i)=groupVort(iGrp,i)-xstart(j)+1
-            else if (groupVort(iGrp,i)<xstart(j) .and. groupVort(iGrp,i+1) >=xstart(j).and. groupVort(iGrp,i+1)<=xend(j)) then
-               groupVortLocal(iGrp,i) = 1
-            endif
 
-            if (groupVort(iGrp,i+1)>=xstart(j) .and. groupVort(iGrp,i+1) <=xend(j)) then
-               groupVortLocal(iGrp,i+1)=groupVort(iGrp,i+1)-xstart(j)+1
-            else if (groupVort(iGrp,i) >= xstart(j).and.groupVort(iGrp,i) <= xend(j).and.groupVort(iGrp,i+1) >=xend(j)) then
-               groupVortLocal(iGrp,i+1) = xSize(j)
-            endif
-
-            if (groupVort(iGrp,i)<=xstart(j) .and. groupVort(iGrp,i+1) >=xend(j)) then
-               groupVortLocal(iGrp,i) =1
-               groupVortLocal(iGrp,i+1) = xSize(j)
-            endif
-
-         enddo
-         ! If a  group does not have a data in this local domain, set it to zero and -1. Use -1 to avoid entering the loop. 
-         if (minval(groupVortLocal(iGrp,:)) ==0)  groupVortLocal(iGrp,:) = [0, 0, 0, -1, -1, -1]  
-      enddo 
-      ! write(*,*) nrank, groupVortLocal
+      !write(*,*) " \\\\\\\\\ 0000000000000 ////////////",trim(domainName),nrank, groupVortLocal
 
       ! stop 
       !/ Push data to MUI interface 
-      call cpu_time(sndTime1)
+      
       do iGrp = 1, groupNumb
          do k=groupVortLocal(iGrp,5),groupVortLocal(iGrp,6)
             do j=groupVortLocal(iGrp,3),groupVortLocal(iGrp,4)
                do i=groupVortLocal(iGrp,1),groupVortLocal(iGrp,2)
-                  point_x = real((i+xstart(1)-1-1),mytype)*grdSpce(1)  + dataOrgShft(1)
-                  point_y = yp(j+xstart(2)-1) + dataOrgShft(2)
-                  point_z = real((k+xstart(3)-1-1),mytype)*grdSpce(3) + dataOrgShft(3)
+                  dataLoc(1) = real((i+xstart(1)-1-1),mytype)*grdSpce(1)  
+                  dataLoc(2)  = yp(j+xstart(2)-1) 
+                  dataLoc(3) = real((k+xstart(3)-1-1),mytype)*grdSpce(3) 
 
-                  ! if (point_x==50.0)print *, "MUI domain ",trim(domainName)," is sending at location", point_x, point_y, point_z
-                  call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "ux"//c_null_char, point_x, &
-                  point_y, point_z, ux1(i,j,k))
-                  call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uy"//c_null_char, point_x, &
-                  point_y, point_z, uy1(i,j,k))
-                  call mui_push_3d_f(uniface_pointers_3d(1)%ptr, "uz"//c_null_char, point_x, &
-                  point_y, point_z, uz1(i,j,k))               
+                  dataLoc = dataLoc * spatialScale + dataOrgShft
+                  temp(1) = ux1(i,j,k)
+                  temp(2) = uy1(i,j,k)
+                  temp(3) = uz1(i,j,k)
+                  ! if (dataLoc(1)==50.0)write(*,*) "MUI domain ",trim(domainName)," is sending at location", dataLoc(1), dataLoc(2) , dataLoc(3)
+                  call mui_push_3d_vector(uniface_pointers_3d(pushInterfacefsID)%ptr, "velocity"//c_null_char, dataLoc(1), &
+                  dataLoc(2) , dataLoc(3), temp)
                   
+                  if (i==50.and.k==50 .and. j==20 .and. nrank==0) write(*,*) "From ",trim(domainName),' push at ', dataLoc(1), dataLoc(2) , dataLoc(3),ux1(i,j,k),uy1(i,j,k),uz1(i,j,k)
                   ! if(trim(domainName)=='RightDomain') then
-                  !  print *, "From ",trim(domainName),' push at ', point_x, point_y, point_z
+                  !  write(*,*) "From ",trim(domainName),' push at ', dataLoc(1), dataLoc(2) , dataLoc(3)
                   ! stop
                   ! endif
                enddo
             enddo
-         enddo
-         
+         enddo  
       enddo
-      call cpu_time(sndTime2)
-      if (nrank==0) print *, "MUI: Sending CPU time ", sndTime2-sndTime1
-      if (nrank ==0 )  write(*,*) "Sending at ", T
+      call cpu_time(sndTime1)
 
-      if (sendReceiveMode==2) then 
-         call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T+dt)  !! this allows for synchronise runs where the other domain does not wait. 
-      else 
-         call mui_commit_3d_f(uniface_pointers_3d(1)%ptr, T)
+      if (nrank ==0 )  write(*,*) "Sending at ", T* timeScale
+
+      call mui_commit_3d_f(uniface_pointers_3d(pushInterfacefsID)%ptr, T* timeScale) 
+      
+      ! if (iSync ==1 .and.  ) call mui_fetch(uniface_pointers_3d(pushInterfacefsID)%ptr, "tempvalue"//c_null_char, 0.0_mytype,0.0_mytype, &
+      ! 0.0_mytype, T-dt*nSyncAhead , spatial_sampler, temporal_sampler, TempValue)
+
+      if (iSync ==1 .and. itime-ifirst .gt. nSyncAhead ) then 
+         call mui_fetch_exact_exact_3d_f(uniface_pointers_3d(pushInterfacefsID)%ptr, &
+          "tempvalue"//c_null_char, 0.0_mytype,0.0_mytype, 0.0_mytype &
+          , (T-dt*nSyncAhead)* timeScale , spatial_sync, temporal_sync, TempValue)
+
+         ! call mui_barrier_3d_f(uniface_pointers_3d(pushInterfacefsID)%ptr, real((t-dt*nForget)* timeScale,c_double))
+      
+         ! call mui_forget_upper_3d_f(uniface_pointers_3d(pushInterfacefsID)%ptr, &
+         !       real((t-dt*nSyncAhead)* timeScale,c_double),reset_log)
+
+
       endif
+      call cpu_time(sndTime2)
 
-      
-
-      
-      if (iSync ==1 ) call mui_fetch(uniface_pointers_3d(MUIBC_ID(1))%ptr, "tempvalue"//c_null_char, 0.0_mytype,0.0_mytype, &
-      0.0_mytype, T-dt*nSyncAhead , spatial_sampler, temporal_sampler, TempValue)
+      if (nrank ==0 )  write(*,*) trim(domainName)," Syncing: wiating for ", sndTime2-sndTime1, "s"
       
 
       

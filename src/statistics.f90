@@ -187,11 +187,11 @@ contains
      stats_time = it
 
     if (nrank==0) then
-      print *,'==========================================================='
+      write(*,*)'==========================================================='
       if (flag_read) then
-        print *,'Reading stat file', stats_time
+        write(*,*)'Reading stat file', stats_time
       else
-        print *,'Writing stat file', stats_time
+        write(*,*)'Writing stat file', stats_time
       endif
     endif
 
@@ -234,11 +234,11 @@ contains
     
     if (nrank==0) then
       if (flag_read) then
-        print *,'Read stat done!'
+        write(*,*)'Read stat done!'
       else
-        print *,'Write stat done!'
+        write(*,*)'Write stat done!'
       endif
-      print *,'==========================================================='
+      write(*,*)'==========================================================='
     endif
 
   end subroutine read_or_write_all_stats

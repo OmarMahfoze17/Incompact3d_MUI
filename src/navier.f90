@@ -1021,7 +1021,7 @@ contains
        ENDIF
     ELSE
        IF (nrank.EQ.0) THEN
-          PRINT *, "Extrapolating drhodt not implemented for timescheme:", itimescheme
+          write(*,*) "Extrapolating drhodt not implemented for timescheme:", itimescheme
           STOP
        ENDIF
     ENDIF
@@ -1370,8 +1370,8 @@ contains
     !Calculate loss of streamwise mean pressure gradient
     call pipe_volume_avg(ux,qm,ep,ncount)
     if (nrank==0) then
-       if (mod(itime, ilist)==0) print *,'Velocity:'
-       if (mod(itime, ilist)==0) print *,'    Bulk velocity before',qm
+       if (mod(itime, ilist)==0) write(*,*)'Velocity:'
+       if (mod(itime, ilist)==0) write(*,*)'    Bulk velocity before',qm
        write(local_io_unit,*) real((itime-1)*dt,mytype), (ub_constant-qm) !write pressure drop
     endif
 
@@ -1399,7 +1399,7 @@ contains
     !Check new bulk velocity
     if (mod(itime, ilist)==0) then
         call pipe_volume_avg(ux,qm,ep,ncount)
-        if (nrank==0) print *,'    Bulk velocity  after',qm
+        if (nrank==0) write(*,*)'    Bulk velocity  after',qm
     endif
     !
     return
@@ -1460,7 +1460,7 @@ contains
     call pipe_volume_avg(ux*ux ,qv,ep,ncount)
     if (nrank.eq.0) then
         if (mod(itime, ilist)==0) write(*,256) is
-        if (mod(itime, ilist)==0) print *,'         Bulk phi before',qm
+        if (mod(itime, ilist)==0) write(*,*)'         Bulk phi before',qm
         write(local_io_unit(is),*) real((itime-1)*dt,mytype),(phib_constant-qm)/(qv)
     endif
 
@@ -1484,7 +1484,7 @@ contains
     !Check new bulk temperature
     if (mod(itime, ilist)==0) then
         call pipe_volume_avg(ux*phi,qm,ep,ncount)
-        if (nrank==0) print *,'          Bulk phi after',qm
+        if (nrank==0) write(*,*)'          Bulk phi after',qm
     endif
     !
     return

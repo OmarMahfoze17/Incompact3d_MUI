@@ -55,7 +55,7 @@ contains
           write(*, *) ' Max value for the dynamic constant field = ', maxdsmagcst
        endif
        write(*, *) '++++++++++++++++++++++++++++++++'
-       !if (nrank==0) print *, "Del y min max= ", minval(del), maxval(del)
+       !if (nrank==0) write(*,*) "Del y min max= ", minval(del), maxval(del)
        write(*, *) '++++++++++++++++++++++++++++++++'
        write(*, *) ' '
     endif

@@ -15,7 +15,7 @@ LCL = local# local,lad,sdu,archer
 IVER = 17# 15,16,17,18
 CMP = gcc# intel,gcc
 FFT = generic# generic,fftw3,mkl
-MUI_FORTRAN_PATH = /home/omar/WORK/codes/MUI/MUI_2.0/wrappers/Fortran
+MUI_FORTRAN_PATH = ${MUI_PATH}/wrappers/Fortran
 BUILD ?=
 
 #######CMP settings###########

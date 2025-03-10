@@ -132,7 +132,7 @@ contains
     else
   
          if (nrank.eq.0) then
-            print *, "ERROR: Unknown itype: ", itype
+            write(*,*) "ERROR: Unknown itype: ", itype
             STOP
          endif
 
@@ -228,7 +228,7 @@ contains
       call boundary_conditions_WRF (ux, uy, uz, phi)
 #endif
     else
-         print *, "boundary_conditions error: check the case type itype"
+         write(*,*) "boundary_conditions error: check the case type itype"
 
     endif
 
@@ -527,8 +527,8 @@ contains
 
     if (called_visu .and. (.not. case_visu_init)) then
 
-       print *, "ERROR: tried to run case-specific visu without initialisation!"
-       print *, "       See the TGV case initialisation for example."
+       write(*,*) "ERROR: tried to run case-specific visu without initialisation!"
+       write(*,*) "       See the TGV case initialisation for example."
        STOP
        
     endif

@@ -36,9 +36,9 @@ contains
     !###################################################################
     ep1(:,:,:)=zero
     if (iibm_read_geom .eq. 1) then
-      if (nrank==0) print *,'Reading geometry'
+      if (nrank==0) write(*,*)'Reading geometry'
       if (iibm .ne. 1) then
-         if (nrank==0) print *, "The current function to read the complex geometry only works with iibm=1, i.e. direct forcing method"
+         if (nrank==0) write(*,*) "The current function to read the complex geometry only works with iibm=1, i.e. direct forcing method"
          stop
       endif
       call decomp_2d_read_one(1,ep1,'./geometry','epsilon.bin',io_geom) 
@@ -211,7 +211,7 @@ contains
     !x-pencil
     ep1=zero
     call geomcomplex(ep1,xstart(1),xend(1),ny,xstart(2),xend(2),xstart(3),xend(3),dx,yp,dz,one)
-    ! if (nrank==0) print*,'    step 1'
+    ! if (nrank==0) write(*,*)'    step 1'
     if(nclx)then
        dxraf =xlx/real(nxraf, mytype)
     else
@@ -219,7 +219,7 @@ contains
     endif
     xepsi=zero
     call geomcomplex(xepsi,1,nxraf,ny,xstart(2),xend(2),xstart(3),xend(3),dxraf,yp,dz,one)
-    ! if (nrank==0) print*,'    step 2'
+    ! if (nrank==0) write(*,*)'    step 2'
     !y-pencil
     if(ncly)then
        dyraf =yly/real(nyraf, mytype)
@@ -234,7 +234,7 @@ contains
     if(.not.ncly)ypraf(nyraf)=yp(ny)
     yepsi=zero
     call geomcomplex(yepsi,ystart(1),yend(1),nyraf,1,nyraf,ystart(3),yend(3),dx,ypraf,dz,one)
-    ! if (nrank==0) print*,'    step 3'
+    ! if (nrank==0) write(*,*)'    step 3'
     !z-pencil
     if(nclz)then
        dzraf=zlz/real(nzraf, mytype)
@@ -243,7 +243,7 @@ contains
     endif
     zepsi=zero
     call geomcomplex(zepsi,zstart(1),zend(1),ny,zstart(2),zend(2),1,nzraf,dx,yp,dzraf,one)
-    ! if (nrank==0) print*,'    step 4'
+    ! if (nrank==0) write(*,*)'    step 4'
 
     !x-pencil
     nobjx(:,:)=0
@@ -267,7 +267,7 @@ contains
        enddo
     enddo
     call MPI_REDUCE(nobjxmax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        nobjxmax=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'        nobjxmax=',mpi_aux_i
 
     nobjxraf(:,:)=0
     ibug=0
@@ -295,10 +295,10 @@ contains
        enddo
     enddo
     call MPI_REDUCE(nobjxmaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        nobjxmaxraf=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'        nobjxmaxraf=',mpi_aux_i
     call MPI_REDUCE(ibug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        ibug=',mpi_aux_i
-    ! if (nrank==0) print*,'    step 5'
+    ! if (nrank==0) write(*,*)'        ibug=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'    step 5'
 
     !y-pencil
     nobjy(:,:)=0
@@ -323,7 +323,7 @@ contains
        enddo
     enddo
     call MPI_REDUCE(nobjymax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        nobjymax=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'        nobjymax=',mpi_aux_i
 
     nobjyraf(:,:)=0
     jbug=0
@@ -351,10 +351,10 @@ contains
        enddo
     enddo
     call MPI_REDUCE(nobjymaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        nobjymaxraf=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'        nobjymaxraf=',mpi_aux_i
     call MPI_REDUCE(jbug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        jbug=',mpi_aux_i
-    ! if (nrank==0) print*,'    step 6'
+    ! if (nrank==0) write(*,*)'        jbug=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'    step 6'
 
     !z-pencil
     nobjz(:,:)=0
@@ -379,7 +379,7 @@ contains
        enddo
     enddo
     call MPI_REDUCE(nobjzmax,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        nobjzmax=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'        nobjzmax=',mpi_aux_i
 
     nobjzraf(:,:)=0
     kbug=0
@@ -407,10 +407,10 @@ contains
        enddo
     enddo
     call MPI_REDUCE(nobjzmaxraf,mpi_aux_i,1,MPI_INTEGER,MPI_MAX,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        nobjzmaxraf=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'        nobjzmaxraf=',mpi_aux_i
     call MPI_REDUCE(kbug,mpi_aux_i,1,MPI_INTEGER,MPI_SUM,0,MUI_COMM_WORLD,code)
-    ! if (nrank==0) print*,'        kbug=',mpi_aux_i
-    ! if (nrank==0) print*,'    step 7'
+    ! if (nrank==0) write(*,*)'        kbug=',mpi_aux_i
+    ! if (nrank==0) write(*,*)'    step 7'
 
     !x-pencil
     do k=1,xsize(3)
@@ -615,7 +615,7 @@ contains
           enddo
        enddo
     endif
-    ! if (nrank==0) print*,'    step 10'
+    ! if (nrank==0) write(*,*)'    step 10'
     !
     return
   end subroutine gene_epsi_3D
@@ -801,10 +801,10 @@ contains
     character(len=*), parameter :: io_geom = "io-geom"
     !###################################################################
     if (read_flag) then
-      if (nrank==0) print *,'Reading geometry'
+      if (nrank==0) write(*,*)'Reading geometry'
       call decomp_2d_read_one(1,ep1,'data/geometry','epsilon.bin',io_geom)   
     else
-      if (nrank==0) print *,'Writing geometry'
+      if (nrank==0) write(*,*)'Writing geometry'
       call decomp_2d_write_one(1,ep1,'data/geometry','epsilon.bin',0,io_geom)
     endif
     !###################################################################

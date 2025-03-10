@@ -21,7 +21,7 @@ program xcompact3d
 
   implicit none
 
-  real :: tstartMUI,tendMUI,timeMUI_1
+  real :: tstartMUI,tBCMUI,tPushMUI,timeMUI_push,timeMUI_fetch,timeMUI_fetch_inst,timeMUI_push_inst
 
   call init_xcompact3d()
 
@@ -48,22 +48,50 @@ program xcompact3d
 #ifdef MUI_COUPLING
       ! Set the order of the coupling operations
       if (trim(MUIcommandArgs).eq.trim('coupled')) then
-         call cpu_time(tstartMUI)
+         
          if (sendReceiveMode==0) then ! No Sending 
+         call cpu_time(tstartMUI)
             call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+            call cpu_time(tBCMUI)
+            timeMUI_fetch=timeMUI_fetch+(tBCMUI-tstartMUI)
+            timeMUI_fetch_inst=(tBCMUI-tstartMUI)
         else if (sendReceiveMode==1) then ! Receive first 
+
+            call cpu_time(tstartMUI)
             call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+            call cpu_time(tBCMUI)
+            timeMUI_fetch=timeMUI_fetch+(tBCMUI-tstartMUI)
+            timeMUI_fetch_inst=(tBCMUI-tstartMUI)
+
+            call cpu_time(tBCMUI)
             call pushMUI(ux1, uy1, uz1)
+            call cpu_time(tPushMUI)
+            timeMUI_push=timeMUI_push+(tPushMUI-tBCMUI)
+            timeMUI_push_inst=(tPushMUI-tBCMUI)
+
         else if (sendReceiveMode==2) then  ! push first 
+            call cpu_time(tstartMUI)
             call pushMUI(ux1, uy1, uz1)
+            call cpu_time(tPushMUI)
+            timeMUI_push=timeMUI_push+(tPushMUI-tstartMUI)
+            timeMUI_push_inst=(tPushMUI-tstartMUI)
+
+            call cpu_time(tPushMUI)
             call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
+            call cpu_time(tBCMUI)
+            timeMUI_fetch=timeMUI_fetch+(tBCMUI-tPushMUI)
+            timeMUI_fetch_inst=(tBCMUI-tPushMUI)
         else 
             write(*,*) "Wrong selction of sendReceiveMode to ", sendReceiveMode
             stop
         endif
-        call cpu_time(tendMUI)
-        timeMUI_1=tendMUI-tstartMUI
-        if (nrank==0) print *, trim(domainName)," : MUI comunication time in Domain  is : ", timeMUI_1, " seconds"
+        if (itime .le. ifirst+1) then
+         call simu_stats(1)
+         timeMUI_fetch = 0.0
+         timeMUI_push = 0.0
+        endif
+        
+        
       else
          call boundary_conditions(rho1,ux1,uy1,uz1,phi1,ep1)
       endif
@@ -105,6 +133,10 @@ program xcompact3d
      enddo !! End sub timesteps
 
      call restart(ux1,uy1,uz1,dux1,duy1,duz1,ep1,pp3(:,:,:,1),phi1,dphi1,px1,py1,pz1,rho1,drho1,mu1,1)
+     if (nrank==0) write(*,*) trim(domainName)," : MUI inst comunication time is Fetch/push : ", &
+      timeMUI_fetch_inst,"/", timeMUI_push_inst, " seconds"
+     if (nrank==0) write(*,*) trim(domainName)," : MUI average comunication time is Fetch/push : ", &
+      timeMUI_fetch/(itime-ifirst-1)/iadvance_time ,"/", timeMUI_push/(itime-ifirst-1)/iadvance_time, " seconds"
 
      call simu_stats(3) ! screen/log output
 
@@ -209,21 +241,19 @@ use mpi_f08 , only : MPI_comm
 
 #ifdef ADIOS2
   if (nrank .eq. 0) then
-     print *, " WARNING === WARNING === WARNING === WARNING === WARNING"
-     print *, " WARNING: Running Xcompact3d with ADIOS2"
-     print *, "          this is currently experimental"
-     print *, "          for safety of results it is recommended"
-     print *, "          to run the default build as this feature"
-     print *, "          is developed. Thank you for trying it."
-     print *, " WARNING === WARNING === WARNING === WARNING === WARNING"
+     write(*,*) " WARNING === WARNING === WARNING === WARNING === WARNING"
+     write(*,*) " WARNING: Running Xcompact3d with ADIOS2"
+     write(*,*) "          this is currently experimental"
+     write(*,*) "          for safety of results it is recommended"
+     write(*,*) "          to run the default build as this feature"
+     write(*,*) "          is developed. Thank you for trying it."
+     write(*,*) " WARNING === WARNING === WARNING === WARNING === WARNING"
   endif
 #endif
   
   call parameter(InputFN)
 
-#ifdef MUI_COUPLING
-  if (trim(MUIcommandArgs).eq.trim('coupled')) call MUI_init ()
-#endif
+
 
   call decomp_2d_init(nx,ny,nz,p_row,p_col,MUI_COMM_WORLD)
   call decomp_2d_io_init()
@@ -243,6 +273,10 @@ use mpi_f08 , only : MPI_comm
 
   call decomp_2d_poisson_init()
   call decomp_info_init(nxm,nym,nzm,phG)
+
+#ifdef MUI_COUPLING
+  if (trim(MUIcommandArgs).eq.trim('coupled')) call MUI_init ()
+#endif
 
   if (ilesmod.ne.0) then
      if (jles.gt.0)  call init_explicit_les()
@@ -341,6 +375,7 @@ subroutine finalise_xcompact3d()
   implicit none
 
   integer :: ierr
+  real :: start, finish
   
   if (itype==2) then
      if(nrank.eq.0)then
@@ -361,6 +396,12 @@ if (trim(MUIcommandArgs).eq.trim('coupled'))  deallocate(uniface_pointers_3d)
   if (ilesmod.ne.0) then
      if (jles.gt.0) call finalise_explicit_les()
   endif
+  ! pause for 20 sec before terminating the code.
+  call cpu_time(start)
+  do
+        call cpu_time(finish)
+        if (finish - start >= 20.0) exit
+  end do
   call decomp_2d_io_finalise()
   call decomp_2d_finalize
   CALL MPI_FINALIZE(ierr)

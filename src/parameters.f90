@@ -78,11 +78,7 @@ subroutine parameter(input_i3d)
   NAMELIST /CASE/ pfront
   NAMELIST/ALMParam/iturboutput,NTurbines,TurbinesPath,NActuatorlines,ActuatorlinesPath,eps_factor,rho_air
   NAMELIST/ADMParam/Ndiscs,ADMcoords,iturboutput,rho_air,T_relax
-#ifdef MUI_COUPLING
-  NAMELIST/MUICoupling/domainName,interfaceName,interface_count,interfaceDirection, &
-   interfacelocation,MUIBC_ID, groupNumb,groupVort, dataOrgShft,tolerance,sendReceiveMode, &
-   sptlSmpType,tmpSmpType,rSpatialSamp,sigmaSpatialSamp,rTempSamp,sigmaTempSamp,nForget,tempMeanSampLower,tempMeanSampUpper
-#endif
+
 
 
 
@@ -177,7 +173,7 @@ subroutine parameter(input_i3d)
   if (ilmn) then
      if (istret.ne.0) then
         if (nrank.eq.0) then
-           print *, "WARNING: LMN solver does not currently support stretching!"
+           write(*,*) "WARNING: LMN solver does not currently support stretching!"
            stop
         endif
      endif
@@ -289,14 +285,14 @@ subroutine parameter(input_i3d)
 #ifdef ADIOS2
   if (nvisu .ne. 1) then
      if (nrank .eq. 0) then
-        print *, "ADIOS2 output is not compatible with coarse visualisation"
-        print *, "disabling coarse visualisation"
-        print *, "To compress the IO, see ADIOS2 options"
+        write(*,*) "ADIOS2 output is not compatible with coarse visualisation"
+        write(*,*) "disabling coarse visualisation"
+        write(*,*) "To compress the IO, see ADIOS2 options"
      endif
      nvisu = 1
   endif
 #if defined(DOUBLE_PREC) && defined(SAVE_SINGLE)
-  print *, "ADIOS2 does not support mixing the simulation and output precision"
+  write(*,*) "ADIOS2 does not support mixing the simulation and output precision"
   call MPI_ABORT(MPI_COMM_WORLD, -1, ierr)
 #endif
 #endif
@@ -333,47 +329,47 @@ subroutine parameter(input_i3d)
   if (nrank == 0) write(*,*) '# parameter input.i3d done'
 #endif
   if (nrank==0) then
-     print *,'==========================================================='
+     write(*,*)'==========================================================='
      if (itype.eq.itype_user) then
-        print *,'User-defined simulation'
+        write(*,*)'User-defined simulation'
      elseif (itype.eq.itype_lockexch) then
-        print *,'Simulating lock-exchange'
+        write(*,*)'Simulating lock-exchange'
      elseif (itype.eq.itype_tgv) then
-        print *,'Simulating TGV'
+        write(*,*)'Simulating TGV'
      elseif (itype.eq.itype_channel) then
-        print *,'Simulating channel'
+        write(*,*)'Simulating channel'
      elseif (itype.eq.itype_pipe) then
-        print *,'Simulating pipe'
+        write(*,*)'Simulating pipe'
      elseif (itype.eq.itype_hill) then
-        print *,'Simulating periodic hill'
+        write(*,*)'Simulating periodic hill'
      elseif (itype.eq.itype_cyl) then
-        print *,'Simulating cylinder'
+        write(*,*)'Simulating cylinder'
      elseif (itype.eq.itype_dbg) then
-        print *,'Debug schemes'
+        write(*,*)'Debug schemes'
      elseif (itype.eq.itype_mixlayer) then
-        print *,'Mixing layer'
+        write(*,*)'Mixing layer'
      elseif (itype.eq.itype_jet) then
-        print *,'Jet is currently unsupported!'
+        write(*,*)'Jet is currently unsupported!'
         stop
      elseif (itype.eq.itype_tbl) then
-        print *,'Turbulent boundary layer'
+        write(*,*)'Turbulent boundary layer'
      elseif (itype.eq.itype_abl) then
-        print *,'Atmospheric boundary layer'
+        write(*,*)'Atmospheric boundary layer'
      elseif (itype.eq.itype_uniform) then
-        print *,'Uniform flow'
+        write(*,*)'Uniform flow'
      elseif (itype.eq.itype_sandbox) then
-        print *,'Sandbox'
+        write(*,*)'Sandbox'
      elseif (itype.eq.itype_cavity) then
-        print *,'Cavity'  
+        write(*,*)'Cavity'  
      elseif (itype.eq.itype_MUIBC) then
-         print *,'MUI coupled boundary condition'
+         write(*,*)'MUI coupled boundary condition'
      elseif (itype.eq.itype_WRF) then
-            print *,'Coupling with WRF'
+            write(*,*)'Coupling with WRF'
      else
-        print *,'Unknown itype: ', itype
+        write(*,*)'Unknown itype: ', itype
         stop
      endif
-     print *,'==========================================================='
+     write(*,*)'==========================================================='
      if (itype.eq.itype_channel) then
        if (.not.cpg) then
          write(*,*) 'Channel forcing with constant flow rate (CFR)'
@@ -394,29 +390,29 @@ subroutine parameter(input_i3d)
      write(*,"(' Time step dt           : ',F17.8)") dt
      !
      if (itimescheme.eq.1) then
-       !print *,'Temporal scheme        : Forwards Euler'
+       !write(*,*)'Temporal scheme        : Forwards Euler'
        write(*,"(' Temporal scheme        : ',A20)") "Forwards Euler"
      elseif (itimescheme.eq.2) then
-       !print *,'Temporal scheme        : Adams-bashforth 2'
+       !write(*,*)'Temporal scheme        : Adams-bashforth 2'
        write(*,"(' Temporal scheme        : ',A20)") "Adams-bashforth 2"
      elseif (itimescheme.eq.3) then
-       !print *,'Temporal scheme        : Adams-bashforth 3'
+       !write(*,*)'Temporal scheme        : Adams-bashforth 3'
        write(*,"(' Temporal scheme        : ',A20)") "Adams-bashforth 3"
      elseif (itimescheme.eq.4) then
-       !print *,'Temporal scheme        : Adams-bashforth 4'
+       !write(*,*)'Temporal scheme        : Adams-bashforth 4'
        write(*,"(' Temporal scheme        : ',A20)") "Adams-bashforth 4"
-       print *,'Error: Adams-bashforth 4 not implemented!'
+       write(*,*)'Error: Adams-bashforth 4 not implemented!'
        stop
      elseif (itimescheme.eq.5) then
-       !print *,'Temporal scheme        : Runge-kutta 3'
+       !write(*,*)'Temporal scheme        : Runge-kutta 3'
        write(*,"(' Temporal scheme        : ',A20)") "Runge-kutta 3"
      elseif (itimescheme.eq.6) then
-       !print *,'Temporal scheme        : Runge-kutta 4'
+       !write(*,*)'Temporal scheme        : Runge-kutta 4'
        write(*,"(' Temporal scheme        : ',A20)") "Runge-kutta 4"
-       print *,'Error: Runge-kutta 4 not implemented!'
+       write(*,*)'Error: Runge-kutta 4 not implemented!'
        stop
      else
-       print *,'Error: itimescheme must be specified as 1-6'
+       write(*,*)'Error: itimescheme must be specified as 1-6'
        stop
      endif
      !
@@ -530,7 +526,7 @@ subroutine parameter(input_i3d)
 #ifdef SAVE_SINGLE
      write(*,*) 'Numerical precision: Double, saving in single'
 #else
-     print *,'Numerical precision: Double'
+     write(*,*)'Numerical precision: Double'
 #endif
 #else
      write(*,*) 'Numerical precision: Single'
